@@ -1,5 +1,8 @@
 package game.map;
-public class Tile
+
+import javafx.scene.shape.Rectangle;
+
+public class Tile extends Rectangle
 {
     private TileType tileType;
 

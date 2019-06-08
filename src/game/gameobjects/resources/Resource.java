@@ -1,4 +1,4 @@
 package game.gameobjects.resources;
 
-public class Wood extends Resource {
+public class Resource {
 }
