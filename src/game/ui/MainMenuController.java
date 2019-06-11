@@ -35,7 +35,16 @@ public class MainMenuController implements Initializable
             Menu.stage.show();
 
         });
+        btnConnectServer.setOnAction(event -> {
 
+            try {
+                Menu.stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("fxml/connectToServer.fxml"))));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Menu.stage.show();
+
+        });
 
 
     }
