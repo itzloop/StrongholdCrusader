@@ -22,16 +22,6 @@ public class MainMenuController implements Initializable
     public void initialize(URL location, ResourceBundle resources)
     {
         Font.loadFont(getClass().getResource("font/Assassin$.ttf").toExternalForm(),30);
-        btnConnectServer.setOnAction(event -> {
-
-            try {
-                Menu.stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("fxml/connectToServer.fxml"))));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Menu.stage.show();
-
-        });
 
         btnExit.setOnAction(event -> {
             System.exit(0);
