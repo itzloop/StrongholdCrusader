@@ -26,7 +26,7 @@ public class createServerController implements Initializable {
     CheckBox localhost;
     @FXML
     Text txtInvalidIP;
-
+    //String string = "[01]?[0-9]{1,2}\\.|2[0-4][0-9]\\.|25[0-5]\\."
 
     public void initialize(URL location, ResourceBundle resources) {
         txtInvalidIP.setVisible(false);
@@ -39,8 +39,7 @@ public class createServerController implements Initializable {
             Menu.stage.show();
         });
 //        boolean selelcted = localhost.isSelected();
-//            if(localhost.isSelected())
-//                System.out.println("yes");
+//            localhost.isSelected()
 //                txtfIP.setDisable(true);
 
     }

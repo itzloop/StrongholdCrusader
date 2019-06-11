@@ -16,8 +16,6 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable
 {
-//    @FXML
-//    ImageView imageView;
     @FXML
     Button btnExit;
     @FXML
