@@ -10,14 +10,11 @@ import java.util.List;
 
 public class Game
 {
-    private List<Player> players;
     private Map map;
     private Server server;
 
     public Game(Server server)
     {
-        players = new LinkedList<>();
-
     }
     public void start() throws SocketException {
         server = new Server(GV.port);

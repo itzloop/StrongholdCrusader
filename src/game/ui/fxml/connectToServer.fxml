@@ -13,7 +13,7 @@
       <Text layoutX="29.0" layoutY="105.0" strokeType="OUTSIDE" strokeWidth="0.0" />
       <Text layoutX="67.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Player Name :" textAlignment="CENTER" wrappingWidth="90.13671922683716" AnchorPane.leftAnchor="60.0" AnchorPane.rightAnchor="449.86328077316284" />
       <Text layoutX="61.0" layoutY="177.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Server List :" textAlignment="CENTER" wrappingWidth="77.13671875" />
-      <TextField layoutX="164.0" layoutY="119.0" />
+      <TextField fx:id="txtName" layoutX="164.0" layoutY="119.0" />
       <Button fx:id="btnConnect" layoutX="74.0" layoutY="221.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="67.0" text="Connect" textAlignment="CENTER" />
    </children>
 </AnchorPane>

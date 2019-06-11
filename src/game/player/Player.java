@@ -11,6 +11,8 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.List;
 import game.map.Map;
+
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Player
@@ -26,11 +28,23 @@ public class Player
         this.name = name;
         this.id = idCounter.getAndIncrement();
     }
+    private Player(String name , int id)
+    {
+        this.name = name;
+        this.id = id;
+    }
+
     //TODO fix this so we can have more than one game at a time i think im wrong but anyways :)
-    public static Player createPlayer(String name) throws SocketException {
+    public static Optional<Player> createPlayer(String name) throws SocketException {
         if(idCounter.get() < 4)
-            return new Player(name);
-        return null;
+            return Optional.ofNullable(new Player(name));
+        return Optional.empty();
+    }
+    public static Optional<Player> clonePlayer(String name , int id)
+    {
+        if(id <= idCounter.get())
+            return Optional.ofNullable(new Player(name , id));
+        return Optional.empty();
     }
     public void sendRequest(Request request) throws IOException {
         String reqStr;
@@ -44,6 +58,9 @@ public class Player
                 break;
         }
     }
+
+
+
     public String getName() {
         return name;
     }

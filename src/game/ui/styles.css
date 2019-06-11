@@ -7,15 +7,7 @@
     -fx-font-family: "Assassin$" ;
     -fx-font-size: 18;
 }
-@font-face{
-    src: url('font/Assassin$.ttf');
 
-}
-
-.firstMenuImage{
+.main{
     -fx-image: url("image/exit.png");
-    -fx-scale-x: 3;
-    -fx-scale-y: 3;
-
-
 }
