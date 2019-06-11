@@ -26,15 +26,6 @@ public class MainMenuController implements Initializable
         btnExit.setOnAction(event -> {
             System.exit(0);
         });
-        btnCreateServer.setOnAction(event -> {
-            try {
-                Menu.stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("fxml/CreateServer.fxml"))));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            Menu.stage.show();
-
-        });
         btnConnectServer.setOnAction(event -> {
 
             try {
@@ -46,6 +37,16 @@ public class MainMenuController implements Initializable
             Menu.stage.show();
 
         });
+        btnCreateServer.setOnAction(event -> {
+            try {
+                Menu.stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("fxml/CreateServer.fxml"))));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            Menu.stage.show();
+
+        });
+
 
 
     }
