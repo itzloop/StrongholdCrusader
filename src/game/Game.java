@@ -2,15 +2,15 @@ package game;
 
 import game.map.Map;
 import game.network.Server;
-import game.player.Client;
-import java.io.IOException;
+import game.player.Player;
+
 import java.net.SocketException;
 import java.util.LinkedList;
 import java.util.List;
 
 public class Game
 {
-    private List<Client> players;
+    private List<Player> players;
     private Map map;
     private Server server;
 
