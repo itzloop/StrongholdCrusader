@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.effect.ImageInput?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.createServerController">
+   <children>
+      <Button fx:id="btnBack" layoutX="32.0" layoutY="342.0" mnemonicParsing="false" text="Back" />
+      <Text fx:id="txtServerName" layoutX="67.0" layoutY="114.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Server Name : " />
+      <TextField fx:id="txtfServerName" layoutX="164.0" layoutY="99.0" prefHeight="25.0" prefWidth="194.0" />
+      <Text fx:id="txtPlayerName" layoutX="67.0" layoutY="157.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-text-inner-color : black" text="Player Name :" />
+      <TextField fx:id="txtfPlayerName" layoutX="164.0" layoutY="140.0" prefHeight="25.0" prefWidth="194.0" />
+      <Text fx:id="txtIP" layoutX="67.0" layoutY="200.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-text-inner-color : black" text="IP : " />
+      <Text layoutX="67.0" layoutY="263.0" strokeType="OUTSIDE" strokeWidth="0.0" />
+      <CheckBox fx:id="txtlocalhost" layoutX="383.0" layoutY="185.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="88.0" text="LocalHost" />
+      <TextField fx:id="txtfIP" layoutX="164.0" layoutY="181.0" prefHeight="25.0" prefWidth="194.0" />
+      <Text fx:id="txtPlayerNumber" layoutX="67.0" layoutY="286.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-text-inner-color : black" text="Player Number :" />
+      <TextField fx:id="txtfPlayerNumber" layoutX="164.0" layoutY="269.0" promptText="max player : 4" />
+      <Text fx:id="txtPort" layoutX="67.0" layoutY="243.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-text-inner-color : black" text="Port :" />
+      <TextField fx:id="txtfPort" layoutX="164.0" layoutY="226.0" />
+      <Button fx:id="btnCreate" layoutX="452.0" layoutY="303.0" mnemonicParsing="false" text="Create" textAlignment="CENTER">
+         <effect>
+            <ImageInput>
+               <source>
+                  <Image url="file:/C:/Users/mohsen/Desktop/StrongholdCrusader/src/ui/image/hamburger.png" />
+               </source>
+            </ImageInput>
+         </effect></Button>
+      <Text fx:id="txtInvalidIP" layoutX="164.0" layoutY="262.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-text-inner-color : red" text="invalid ip !" textAlignment="CENTER" wrappingWidth="59.13671875" />
+   </children>
+</AnchorPane>
