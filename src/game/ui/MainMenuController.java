@@ -38,6 +38,7 @@ public class MainMenuController implements Initializable
         btnConnectServer.setOnAction(event -> {
 
             try {
+                System.out.println("this shit is gonna be lit");
                 Menu.stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("fxml/connectToServer.fxml"))));
             } catch (IOException e) {
                 e.printStackTrace();
