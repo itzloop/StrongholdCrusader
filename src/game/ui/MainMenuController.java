@@ -38,7 +38,7 @@ public class MainMenuController implements Initializable
 
         });
 
-        btnConnectServer.setOnAction(event -> {
+        btnCreateServer.setOnAction(event -> {
 
 
             System.out.println("shits fine");
