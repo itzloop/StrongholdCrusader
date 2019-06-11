@@ -32,27 +32,5 @@ public class createServerController implements Initializable {
             }
             Menu.stage.show();
         });
-
-//        localhost.onMouseClickedProperty();
-//
-//        if(true)
-//        {
-//            System.out.println(localhost.isSelected());
-//            localhost.setSelected(true);
-//
-//        }
-//        localhost.setOnAction(event -> {
-//        });
-//        else {
-//            System.out.println(localhost.isSelected());
-//            localhost.setSelected(false);
-//        }
-
-
-
-//        boolean selelcted = localhost.isSelected();
-//            localhost.isSelected()
-//                txtfIP.setDisable(true);
-
     }
 }
