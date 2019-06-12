@@ -18,4 +18,9 @@ public class Request
     public String getBody() {
         return body;
     }
+
+    @Override
+    public String toString() {
+        return requestType +" " + body;
+    }
 }

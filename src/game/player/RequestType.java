@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum  RequestType {
-    ESTABLISHING_CONNECTION(0) , MOVE_UNIT(1);
+    GET_SERVERS(0),ESTABLISHING_CONNECTION(1) , MOVE_UNIT(2);
     private final int reqNum;
 
     RequestType(int reqNum)

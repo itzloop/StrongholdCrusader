@@ -8,10 +8,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
+
 import game.map.Map;
 
 import java.util.ArrayList;
@@ -72,14 +70,23 @@ public class Player
         switch (requestType)
         {
             case ESTABLISHING_CONNECTION:
-                Request request = new Request(RequestType.ESTABLISHING_CONNECTION , new Gson().toJson(this));
+                Request request = new Request(RequestType.ESTABLISHING_CONNECTION , new Gson().toJson(this).trim());
                 byte[] requestByte =new Gson().toJson(request).getBytes();
-                System.out.println(requestByte.length);
                 socket.send(new DatagramPacket(requestByte , requestByte.length , InetAddress.getLocalHost() ,GV.port ));
                 break;
         }
     }
-
+    public List<Integer> getServers() throws IOException {
+        byte[] requestByte = new Gson().toJson(new Request(RequestType.GET_SERVERS , this.getId()+"$%@#%#@"+this.getName())).getBytes();
+        socket.send(new DatagramPacket(requestByte , requestByte.length,InetAddress.getLocalHost() , GV.serverHolderPort));
+        byte[] svList = new byte[GV.packetSize];
+        DatagramPacket packet = new DatagramPacket(svList , svList.length);
+        socket.receive(packet);
+        String s = new String(packet.getData());
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Integer>>(){}.getType();
+        return  gson.fromJson(s , type);
+    }
 
     private String sendPlayer()
     {
