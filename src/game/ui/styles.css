@@ -1,4 +1,5 @@
-.btn{
+.btn
+{
     -fx-background-image: url("image/TextField.png");
     -fx-focus-color: transparent;-fx-background-size:197 31 ;
     -fx-background-repeat: no-repeat;
@@ -7,15 +8,15 @@
     -fx-font-family: "Assassin$" ;
     -fx-font-size: 18;
 }
-@font-face{
+@font-face
+{
     src: url('font/Assassin$.ttf');
 
 }
 
-.firstMenuImage{
-    -fx-image: url("image/exit.png");
-    -fx-scale-x: 3;
-    -fx-scale-y: 3;
-
-
+.main
+{
+    -fx-background-image: url("image/background.jpg");
+    -fx-background-size: 600 400;
+    -fx-background-repeat: no-repeat;
 }
