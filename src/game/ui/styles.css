@@ -1,22 +1,71 @@
 .btn
 {
-    -fx-background-image: url("image/TextField.png");
-    -fx-focus-color: transparent;-fx-background-size:197 31 ;
+
+    -fx-background-image: url("image/shield.png");
+    -fx-background-color: transparent;
     -fx-background-repeat: no-repeat;
-    -fx-pref-width: 197;
-    -fx-pref-height: 28;
+    -fx-background-size: 80 100;
+    -fx-min-width: 80;
+    -fx-min-height: 100;
     -fx-font-family: "Assassin$" ;
     -fx-font-size: 18;
 }
-@font-face
+.btnSetting
 {
-    src: url('font/Assassin$.ttf');
+    -fx-background-image: url("image/setting.png");
+    -fx-background-color: transparent;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 50 50;
+    -fx-min-width: 50;
+    -fx-min-height: 50;
+}
+.btnBack
+{
+    -fx-background-image: url("image/back.png");
+    -fx-background-color: transparent;
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: 50 50;
+    -fx-min-width: 50;
+    -fx-min-height: 50;
 
 }
 
+@font-face
+{
+    src: url('font/Assassin$.ttf');
+}
 .main
 {
     -fx-background-image: url("image/background.jpg");
     -fx-background-size: 600 400;
     -fx-background-repeat: no-repeat;
 }
+.fontCreate
+{
+    -fx-font-family: "Assassin$" ;
+    -fx-font-size: 18;
+}
+.fontConnect
+{
+    -fx-font-family: "Assassin$";
+    -fx-font-size: 22;
+}
+
+
+.imgBackground
+{
+    -fx-background-image: url("image/background1.jpg");
+    -fx-background-size: 600 400;
+    -fx-background-repeat: no-repeat;
+}
+
+.gameTitle
+{
+    -fx-image: url("image/title.png");
+}
+
+
+
+
+
+

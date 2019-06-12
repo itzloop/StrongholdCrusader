@@ -1,47 +1,61 @@
 package game.network;
 
 import game.GV;
+import game.player.Player;
 import game.player.Request;
-import game.player.Respond;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
+
 
 public class Server
 {
     Queue<Request> requests;
-
+    private List<Player> players;
     private final int port;
     DatagramSocket server;
     DatagramPacket packet = null;
     byte[] buffer = null;
     public Server(int port) throws SocketException
     {
+        players = new LinkedList<>();
         server = new DatagramSocket(port);
         buffer = new byte[GV.packetSize];
         this.port = port;
     }
 
     //TODO az shabke samte client req begir handle kon javabo bargardoon
-    public void handle(DatagramPacket packet) throws InterruptedException {
-        String string = new String(packet.getData());
-        System.out.println(string);
+    public void handle(DatagramPacket packet)  {
+        new Thread(() -> {
+            String string = new String(packet.getData());
+            System.out.println(string);
+            String[] reqPart = string.split(":");
+//            switch (Request.valueOf(Integer.parseInt(reqPart[0])))
+//            {
+//                    break;
+//            }
+        }).start();
     }
 
     public void listen() {
         new Thread(() -> {
-            System.out.println("server started...");
+            System.out.println("server started on port: " + port);
            while (true)
            {
                packet = new DatagramPacket(buffer , buffer.length);
                try {
-                   this.handle(packet);
-               } catch (InterruptedException e) {
+                   server.receive(packet);
+                   System.out.println("packet received");
+                    handle(packet);
+               } catch (IOException e) {
                    e.printStackTrace();
                }
+
            }
         }).start();
     }
