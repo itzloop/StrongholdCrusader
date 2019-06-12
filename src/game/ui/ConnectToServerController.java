@@ -2,6 +2,7 @@ package game.ui;
 
 import game.player.Player;
 import game.player.Request;
+import game.player.RequestType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -29,7 +30,7 @@ public class ConnectToServerController implements Initializable
                 Optional<Player> player = Player.createPlayer(txtName.getText());
                 if(player.isPresent())
                 {
-                    player.get().sendRequest(Request.ESTABLISHING_CONNECTION);
+                    player.get().sendRequest(RequestType.ESTABLISHING_CONNECTION);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

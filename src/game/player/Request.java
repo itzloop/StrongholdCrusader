@@ -1,18 +1,21 @@
 package game.player;
 
-import java.util.Arrays;
-import java.util.Optional;
 
-public enum Request
+public class Request
 {
-    ESTABLISHING_CONNECTION(0) , MOVE_UNIT(1);
-    private final int reqNum;
+    private RequestType requestType;
+    private String body;
 
-    Request(int reqNum)
-    {
-        this.reqNum = reqNum;
+    public Request(RequestType requestType, String body) {
+        this.requestType = requestType;
+        this.body = body;
     }
-    public static Optional<Request> valueOf(int request){
-        return Arrays.stream(values()).filter(req -> req.reqNum == request).findFirst();
+
+    public RequestType getRequestType() {
+        return requestType;
+    }
+
+    public String getBody() {
+        return body;
     }
 }

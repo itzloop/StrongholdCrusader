@@ -10,7 +10,6 @@ import java.util.List;
 
 public class Game
 {
-    private Map map;
     private Server server;
 
     public Game(Server server)
