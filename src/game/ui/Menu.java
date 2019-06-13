@@ -18,6 +18,9 @@ public class Menu extends Application
     public void start(Stage primaryStage) throws Exception {
         stage = primaryStage;
         Parent root = FXMLLoader.load(getClass().getResource("fxml/menu.fxml"));
+        primaryStage.setOnCloseRequest(event -> {
+            System.exit(0);
+        });
         primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.setTitle("Stronghold Crusader");
         primaryStage.show();

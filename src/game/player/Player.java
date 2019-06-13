@@ -3,8 +3,9 @@ package game.player;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import game.GV;
-import javafx.application.Application;
-import javafx.stage.Stage;
+import game.comunication.Request;
+import game.comunication.RequestType;
+import game.comunication.Respond;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -12,10 +13,11 @@ import java.net.*;
 
 import game.map.Map;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 public class Player
 {
@@ -28,11 +30,37 @@ public class Player
     private String name;
     private transient Map map;
     private transient DatagramSocket socket;
+    BlockingQueue<Respond> responds;
+    Optional<List<Integer>> servers;
+    Thread respondListener = new Thread(() -> {
+       while (true)
+       {
+           if(!responds.isEmpty())
+           {
+               handleRespond(responds.poll());
+           }
+       }
+    });
+    Thread respondHandler = new Thread(() -> {
+        DatagramPacket packet;
+        byte[] get = new byte[GV.packetSize];
+        while (true)
+       {
+           packet = new DatagramPacket(get, get.length);
+           try {
+               socket.receive(packet);
+               byte[] data = new byte[packet.getLength()];
+               System.arraycopy(packet.getData() , 0, data , 0 , packet.getLength());
+               Respond respond = new Gson().fromJson(new String(data) , Respond.class);
+               responds.add(respond);
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+       }
+    });
 
 
-
-
-    private Player(String name) throws SocketException {
+    private Player(String name) {
         this.id = idCounter.getAndIncrement();
         this.port = portCounter.getAndIncrement();
         this.name = name;
@@ -48,6 +76,10 @@ public class Player
             }
             break;
         }
+        servers = Optional.empty();
+        responds = new ArrayBlockingQueue<>(1000);
+        respondListener.start();
+        respondHandler.start();
     }
 
     private Player(String name , int id , int port)
@@ -58,34 +90,50 @@ public class Player
     }
 
     //TODO fix this so we can have more than one game at a time i think im wrong but anyways :)
-    public static Optional<Player> createPlayer(String name) throws SocketException {
+    public static Optional<Player> createPlayer(String name)  {
         if(idCounter.get() < GV.maxPlayers)
             return Optional.ofNullable(new Player(name));
         return Optional.empty();
     }
 
 
-    public void sendRequest(RequestType requestType) throws IOException {
-
-        switch (requestType)
+    public void handleRespond(Respond respond)
+    {
+        switch (respond.getRespondType())
         {
-            case ESTABLISHING_CONNECTION:
-                Request request = new Request(RequestType.ESTABLISHING_CONNECTION , new Gson().toJson(this).trim());
-                byte[] requestByte =new Gson().toJson(request).getBytes();
-                socket.send(new DatagramPacket(requestByte , requestByte.length , InetAddress.getLocalHost() ,GV.port ));
+            case SERVER_LIST_SENT:
+                System.out.println(respond.getBody());
+                Type type = new TypeToken<List<Integer>>(){}.getType();
+                List<Integer> ports = new Gson().fromJson(respond.getBody() , type);
+                servers = Optional.ofNullable(ports);
                 break;
         }
     }
-    public List<Integer> getServers() throws IOException {
-        byte[] requestByte = new Gson().toJson(new Request(RequestType.GET_SERVERS , this.getId()+"$%@#%#@"+this.getName())).getBytes();
-        socket.send(new DatagramPacket(requestByte , requestByte.length,InetAddress.getLocalHost() , GV.serverHolderPort));
-        byte[] svList = new byte[GV.packetSize];
-        DatagramPacket packet = new DatagramPacket(svList , svList.length);
-        socket.receive(packet);
-        String s = new String(packet.getData());
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<Integer>>(){}.getType();
-        return  gson.fromJson(s , type);
+
+    public Optional<List<Integer>> serverList()
+    {
+        if(servers.isPresent())
+            return servers;
+        else
+            return Optional.empty();
+    }
+
+    public void sendRequest(RequestType requestType) throws IOException {
+        Request request;
+        byte[] requestByte;
+        switch (requestType)
+        {
+            case ESTABLISHING_CONNECTION:
+                request = new Request(RequestType.ESTABLISHING_CONNECTION , new Gson().toJson(this).trim());
+                requestByte =new Gson().toJson(request).getBytes();
+                socket.send(new DatagramPacket(requestByte , requestByte.length , InetAddress.getLocalHost() ,GV.port ));
+                break;
+            case GET_SERVERS:
+                request = new Request(requestType , port+"");
+                requestByte = new Gson().toJson(request).getBytes();
+                socket.send(new DatagramPacket(requestByte , requestByte.length , InetAddress.getLocalHost() , GV.serverHolderPort));
+                break;
+        }
     }
 
     private String sendPlayer()

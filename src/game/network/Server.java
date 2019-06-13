@@ -2,16 +2,16 @@ package game.network;
 
 import com.google.gson.Gson;
 import game.GV;
+import game.comunication.RequestType;
 import game.map.Map;
 import game.player.Player;
-import game.player.Request;
-import game.player.RequestType;
+import game.comunication.Request;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -23,19 +23,19 @@ public class Server
     private Map map;
     private java.util.Map<Integer, Player> players;
     private final int port;
-    DatagramSocket server;
+    DatagramSocket socket;
     DatagramPacket packet = null;
     byte[] buffer = null;
     Thread requestListener = new Thread(() -> {
         while (true)
         { if(!requests.isEmpty()) handleRequest(requests.poll()); }
     });
-    Thread serverStarter = new Thread(() -> {
+    Thread server = new Thread(() -> {
         while (true)
         {
             try {
                 packet = new DatagramPacket(buffer , buffer.length);
-                server.receive(packet);
+                socket.receive(packet);
                 parseRequest(packet);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -48,7 +48,7 @@ public class Server
         requests = new ArrayBlockingQueue<>(1000);
         requestListener.start();
         players = new HashMap<>();
-        server = new DatagramSocket(port);
+        socket = new DatagramSocket(port);
         buffer = new byte[GV.packetSize];
         this.port = port;
     }
@@ -74,12 +74,14 @@ public class Server
     }
     public void start() {
         try {
-            server.send(new DatagramPacket(new byte[1] , 1 , InetAddress.getLocalHost() , GV.serverHolderPort));
+            Request request = new Request(RequestType.ADD_SERVER , port + "");
+            byte[] data = new Gson().toJson(request).getBytes();
+            socket.send(new DatagramPacket(data , data.length , InetAddress.getLocalHost() , GV.serverHolderPort));
         } catch (IOException e) {
             e.printStackTrace();
         }
-        serverStarter.start();
-        System.out.println("server started on port: " + port);
+        server.start();
+        System.out.println("socket started on port: " + port);
     }
 
     public BlockingQueue<Request> getRequests() {
@@ -92,8 +94,8 @@ public class Server
     }
 
     public static void main(String[] args) throws SocketException {
-        Server server = new Server(new Scanner(System.in).nextInt());
-        server.start();
+        Server socket = new Server(new Scanner(System.in).nextInt());
+        socket.start();
 
 
     }

@@ -1,10 +1,10 @@
-package game.player;
+package game.comunication;
 
 import java.util.Arrays;
 import java.util.Optional;
 
 public enum  RequestType {
-    GET_SERVERS(0),ESTABLISHING_CONNECTION(1) , MOVE_UNIT(2);
+    ADD_SERVER(0),GET_SERVERS(1),ESTABLISHING_CONNECTION(2) , MOVE_UNIT(3);
     private final int reqNum;
 
     RequestType(int reqNum)

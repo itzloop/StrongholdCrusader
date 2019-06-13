@@ -1,4 +1,4 @@
-package game.player;
+package game.comunication;
 
 
 public class Request
