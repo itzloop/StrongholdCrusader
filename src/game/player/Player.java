@@ -10,7 +10,7 @@ import game.comunication.Respond;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.*;
-
+import game.network.requestHandler;
 import game.map.Map;
 
 import java.util.Arrays;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
-public class Player
+public class Player implements requestHandler
 {
 
 
@@ -30,9 +30,9 @@ public class Player
     private String name;
     private transient Map map;
     private transient DatagramSocket socket;
-    BlockingQueue<Respond> responds;
-    Optional<List<Integer>> servers;
-    Thread respondListener = new Thread(() -> {
+    private transient BlockingQueue<Respond>  responds;
+    private transient Optional<List<Integer>> servers;
+    private final transient Thread respondListener = new Thread(() -> {
        while (true)
        {
            if(!responds.isEmpty())
@@ -41,7 +41,7 @@ public class Player
            }
        }
     });
-    Thread respondHandler = new Thread(() -> {
+    private final transient Thread respondHandler = new Thread(() -> {
         DatagramPacket packet;
         byte[] get = new byte[GV.packetSize];
         while (true)
@@ -97,44 +97,58 @@ public class Player
     }
 
 
+
+    @Override
     public void handleRespond(Respond respond)
     {
         switch (respond.getRespondType())
         {
             case SERVER_LIST_SENT:
-                System.out.println(respond.getBody());
                 Type type = new TypeToken<List<Integer>>(){}.getType();
                 List<Integer> ports = new Gson().fromJson(respond.getBody() , type);
                 servers = Optional.ofNullable(ports);
                 break;
+            case PLAYER_CREATED:
+                map = new Gson().fromJson(respond.getBody() , Map.class);
+                map.initializeTiles(map.getTilesNumber());
+                System.out.println(map.toString());
+                break;
+        }
+    }
+
+    @Override
+    public void handleRequest(Request request) {
+        try {
+            byte[] requestByte;
+            switch (request.getRequestType())
+            {
+                case ESTABLISHING_CONNECTION:
+                    Request req = new Request(RequestType.ESTABLISHING_CONNECTION , new Gson().toJson(this));
+                    requestByte =new Gson().toJson(req).getBytes();
+                    socket.send(new DatagramPacket(requestByte , requestByte.length , InetAddress.getLocalHost() ,Integer.parseInt(request.getBody() )));
+                    break;
+                case GET_SERVERS:
+                    requestByte = new Gson().toJson(request).getBytes();
+                    socket.send(new DatagramPacket(requestByte , requestByte.length , InetAddress.getLocalHost() , GV.serverHolderPort));
+                    break;
+            }
+        }catch (Exception e)
+        {
+
         }
     }
 
     public Optional<List<Integer>> serverList()
     {
+        System.out.println("serverList: "+ servers);
         if(servers.isPresent())
+        {
             return servers;
+        }
         else
             return Optional.empty();
     }
 
-    public void sendRequest(RequestType requestType) throws IOException {
-        Request request;
-        byte[] requestByte;
-        switch (requestType)
-        {
-            case ESTABLISHING_CONNECTION:
-                request = new Request(RequestType.ESTABLISHING_CONNECTION , new Gson().toJson(this).trim());
-                requestByte =new Gson().toJson(request).getBytes();
-                socket.send(new DatagramPacket(requestByte , requestByte.length , InetAddress.getLocalHost() ,GV.port ));
-                break;
-            case GET_SERVERS:
-                request = new Request(requestType , port+"");
-                requestByte = new Gson().toJson(request).getBytes();
-                socket.send(new DatagramPacket(requestByte , requestByte.length , InetAddress.getLocalHost() , GV.serverHolderPort));
-                break;
-        }
-    }
 
     private String sendPlayer()
     {
@@ -156,6 +170,10 @@ public class Player
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public int getPort() {
+        return port;
     }
 
     public static void main(String[] args) throws SocketException {

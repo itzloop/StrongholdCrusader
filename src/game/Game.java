@@ -16,7 +16,7 @@ public class Game
     {
     }
     public void start() throws SocketException {
-        server = new Server(GV.port);
+        server = new Server();
         //TODO initialize the map here
         server.start();
 

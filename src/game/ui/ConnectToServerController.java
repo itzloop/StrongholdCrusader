@@ -33,66 +33,46 @@ public class ConnectToServerController implements Initializable
     @FXML Button btnBackToMenu;
     @FXML TextField txtName;
     @FXML ComboBox cmbServerList;
-//    Thread getServers = new Thread(() -> {
-//        try {
-//            DatagramSocket socket = new DatagramSocket();
-//            System.out.println(socket.getPort());
-//            Request getServerRequest = new Request(RequestType.GET_SERVERS , socket.getPort()+"");
-//            DatagramPacket packet;
-//            byte[] buffer = new byte[GV.packetSize];
-//            while (true)
-//            {
-//                packet = new DatagramPacket(buffer , buffer.length);
-//                socket.receive(packet);
-//                byte[] data = new byte[packet.getLength()];
-//                System.arraycopy(packet.getData() , 0 , data , 0 , packet.getLength());
-//                String s = new String(data);
-//                integers = new Gson().fromJson(s , type);
-//                cmbServerList.setItems(FXCollections.observableList(integers));
-//
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//    });
+    static Player player;
+    Thread fillCombobox =  new Thread(() -> {
+            try {
+                player.handleRequest(new Request(RequestType.GET_SERVERS , player.getPort()+""));
+                while (true)
+                {
+                    Optional<List<Integer>> servers =  player.serverList();
+                    if(servers.isPresent())
+                    {
+                        System.out.println(servers.get());
+                        cmbServerList.getItems().clear();
+                        cmbServerList.getItems().addAll(FXCollections.observableArrayList(servers.get()));
+                        cmbServerList.setVisibleRowCount(servers.get().size());
+                        break;
+                    }
+                    continue;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+    });
 
     //TODO Fix this here and in the Player and Servers Class
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Optional<Player> player = Player.createPlayer(txtName.getText());
-        new Thread(() -> {
-            if (player.isPresent()){
-                try {
-                    player.get().sendRequest(RequestType.GET_SERVERS);
-                    while (true)
-                    {
-                        Optional<List<Integer>> servers =  player.get().serverList();
-                        if(servers.isPresent())
-                        {
-                            System.out.println(servers.get());
-                            cmbServerList.getItems().addAll(FXCollections.observableArrayList(servers.get()));
-                            cmbServerList.setVisibleRowCount(3);
-                            break;
-                        }
-                        continue;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+        player = Menu.player;
+        player.setName(txtName.getText());
+        fillCombobox.start();
         btnConnect.setOnAction(event -> {
             try {
-
-                if(player.isPresent())
+                if(!cmbServerList.getSelectionModel().isEmpty())
                 {
-                    player.get().sendRequest(RequestType.ESTABLISHING_CONNECTION);
+                    player.handleRequest(new Request(RequestType.ESTABLISHING_CONNECTION , cmbServerList.getValue().toString() ));
+                    Menu.stage.hide();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
+
 
         btnBackToMenu.setOnAction(event -> {
             try {
@@ -105,5 +85,3 @@ public class ConnectToServerController implements Initializable
         });
     }
 }
-
-//link: https://stackoverflow.com/questions/12018245/regular-expression-to-validate-username

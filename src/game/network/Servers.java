@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-public class Servers {
+public class Servers implements requestHandler {
     private List<Integer> ports;
     private DatagramSocket socket;
     private DatagramPacket packet;
@@ -61,7 +61,7 @@ public class Servers {
     });
 
 
-    Servers() throws SocketException {
+    public Servers() throws SocketException {
         buffer = new byte[GV.packetSize];
         ports = new ArrayList<>();
         socket = new DatagramSocket(GV.serverHolderPort);
@@ -80,7 +80,7 @@ public class Servers {
         requests.add(request);
     }
 
-    private void handleRespond(Respond respond)
+    public void handleRespond(Respond respond)
     {
         switch (respond.getRespondType())
         {
@@ -95,7 +95,7 @@ public class Servers {
         }
     }
 
-    private void handleRequest(Request request )
+    public void handleRequest(Request request )
     {
 
         try {

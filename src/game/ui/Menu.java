@@ -1,5 +1,6 @@
 package game.ui;
 
+import game.player.Player;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,14 +14,13 @@ import java.io.File;
 public class Menu extends Application
 {
     static Stage stage;
-
+    static Player player;
     @Override
     public void start(Stage primaryStage) throws Exception {
         stage = primaryStage;
+        player = Player.createPlayer("").get();
         Parent root = FXMLLoader.load(getClass().getResource("fxml/menu.fxml"));
-        primaryStage.setOnCloseRequest(event -> {
-            System.exit(0);
-        });
+        primaryStage.setOnCloseRequest(event -> System.exit(0));
         primaryStage.setScene(new Scene(root, 600, 400));
         primaryStage.setTitle("Stronghold Crusader");
         primaryStage.show();
