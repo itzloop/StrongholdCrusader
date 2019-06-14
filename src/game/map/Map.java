@@ -1,5 +1,6 @@
 package game.map;
 
+import game.GV;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -17,14 +18,6 @@ import javafx.stage.Stage;
 
 public class Map extends Application
 {
-    private int num;
-    class Change implements ChangeListener{
-
-        @Override
-        public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-
-        }
-    }
     String name;
     private int width;
     private int height;
@@ -33,8 +26,37 @@ public class Map extends Application
     private transient VBox vBox;
     private transient HBox hBox;
     private transient ScrollPane scrollPane;
-    private transient BorderPane pane;
-    Stage stage;
+    private transient BorderPane borderPane;
+    private transient double sceneX=0;
+    private transient double sceneY=0;
+    private transient Thread scrollOnMouseMove = new Thread(() -> {
+        while (true)
+        {
+            if(sceneX > Screen.getPrimary().getBounds().getWidth()-50)
+            {
+                scrollPane.setHvalue(scrollPane.getHvalue()+ GV.scrollOffset);
+            }
+            if(sceneX <5)
+            {
+                scrollPane.setHvalue(scrollPane.getHvalue()-GV.scrollOffset);
+            }
+
+            if(sceneY > Screen.getPrimary().getBounds().getHeight()-50)
+            {
+                scrollPane.setVvalue(scrollPane.getVvalue()+GV.scrollOffset);
+            }
+            if (sceneY < 5)
+            {
+                scrollPane.setVvalue(scrollPane.getVvalue()-GV.scrollOffset);
+            }
+            try {
+                Thread.sleep(60);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    });
+
 
     public Map(){
 
@@ -46,52 +68,28 @@ public class Map extends Application
         this.width = width;
         this.height = height;
         tilesNumber = new int[width][height];
-
+        loadMap();
         tiles = new Tile[width][height];
+        init();
+    }
+
+    //TODO later make this so we can load map from a file
+    public void loadMap()
+    {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
                 tilesNumber[i][j] = (int)(Math.random()*3);
             }
         }
+    }
 
+    public void init()
+    {
+        //initializing the
         vBox = new VBox();
         scrollPane = new ScrollPane(vBox);
-        scrollPane.setPannable(true);
-        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-        scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
-            if (event.getDeltaY() != 0) {
-                event.consume();
-            }
-        });
-        scrollPane.addEventHandler(MouseEvent.ANY,event -> {
-            if(event.getSceneX() > stage.getWidth()-50)
-            {
-                scrollPane.setHvalue(scrollPane.getHvalue()+0.001);
-                System.out.println(scrollPane.getHvalue());
-            }
-            if(event.getSceneX() <5)
-            {
-                scrollPane.setHvalue(scrollPane.getHvalue()-0.001);
-                System.out.println(scrollPane.getHvalue());
-            }
-
-            if(event.getSceneY() > stage.getHeight()-50)
-            {
-                scrollPane.setVvalue(scrollPane.getVvalue()+0.001);
-                System.out.println(scrollPane.getHvalue());
-            }
-            if (event.getSceneY() < 5)
-            {
-                scrollPane.setVvalue(scrollPane.getVvalue()-0.001);
-                System.out.println(scrollPane.getVvalue());
-            }
-        });
-
-        scrollPane.setHmin(0);
-        pane = new BorderPane();
-        pane.setCenter(scrollPane);
-
+        borderPane = new BorderPane();
+        borderPane.setCenter(scrollPane);
 
         tiles = new Tile[width][height];
         for (int i = 0; i < width; i++) {
@@ -102,16 +100,33 @@ public class Map extends Application
             }
             vBox.getChildren().add(hBox);
         }
+        handleEvents();
+
     }
 
 
+    public void handleEvents()
+    {
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        scrollPane.addEventFilter(ScrollEvent.SCROLL, event -> {
+            if (event.getDeltaY() != 0) {
+                event.consume();
+            }
+        });
+        scrollPane.addEventHandler(MouseEvent.ANY,event -> {
+            sceneX = event.getSceneX();
+            sceneY = event.getSceneY();
+        });
+        scrollOnMouseMove.start();
+    }
 
     public void initializeTiles(int[][] tilesNumber)
     {
 
 //        gridPane = new GridPane();
 //        scrollPane = new ScrollPane(gridPane);
-//        pane = new Pane(scrollPane);
+//        borderPane = new Pane(scrollPane);
 //
 //        tiles = new Tile[width][height];
 //        for (int i = 0; i < width; i++) {
@@ -123,7 +138,7 @@ public class Map extends Application
     }
 
     public Pane getPane() {
-        return pane;
+        return borderPane;
     }
 
 
@@ -167,9 +182,8 @@ public class Map extends Application
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Map map = new Map("Sting" , 200 , 200);
-        System.out.println(map.toString());
-        map.stage = primaryStage;
+        Map map = new Map("Sting" , 200 , 200 );
+        //System.out.println(map.toString());
         primaryStage.setScene(new Scene(map.getPane()));
         primaryStage.setFullScreen(true);
         primaryStage.show();
