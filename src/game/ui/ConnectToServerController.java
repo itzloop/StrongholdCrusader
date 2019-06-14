@@ -66,7 +66,8 @@ public class ConnectToServerController implements Initializable
                 if(!cmbServerList.getSelectionModel().isEmpty())
                 {
                     player.handleRequest(new Request(RequestType.ESTABLISHING_CONNECTION , cmbServerList.getValue().toString() ));
-                    Menu.stage.hide();
+                   //Menu.stage.setScene(new Scene(player.getMap().getPane()));
+                    Menu.stage.show();
                 }
             } catch (Exception e) {
                 e.printStackTrace();

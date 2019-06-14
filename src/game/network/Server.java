@@ -59,7 +59,7 @@ public class Server implements requestHandler
     public Server()
     {
         //initialize the map
-        map = new Map("sample Map" , 70 , 70);
+        //map = new Map("sample Map" , 70 , 70);
         //initialize and start respond and request listeners
         requests = new ArrayBlockingQueue<>(1000);
         responds = new ArrayBlockingQueue<>(1000);

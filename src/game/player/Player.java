@@ -12,6 +12,8 @@ import java.lang.reflect.Type;
 import java.net.*;
 import game.network.requestHandler;
 import game.map.Map;
+import game.ui.Menu;
+import javafx.scene.Scene;
 
 import java.util.Arrays;
 import java.util.List;
@@ -110,8 +112,7 @@ public class Player implements requestHandler
                 break;
             case PLAYER_CREATED:
                 map = new Gson().fromJson(respond.getBody() , Map.class);
-                map.initializeTiles(map.getTilesNumber());
-                System.out.println(map.toString());
+                //map.initializeTiles(map.getTilesNumber());
                 break;
         }
     }
@@ -154,6 +155,10 @@ public class Player implements requestHandler
     {
         Gson gson = new Gson();
         return gson.toJson(this);
+    }
+
+    public Map getMap() {
+        return map;
     }
 
     public String getName() {

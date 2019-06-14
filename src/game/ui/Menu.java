@@ -13,7 +13,7 @@ import java.io.File;
 
 public class Menu extends Application
 {
-    static Stage stage;
+    public static Stage stage;
     static Player player;
     @Override
     public void start(Stage primaryStage) throws Exception {
