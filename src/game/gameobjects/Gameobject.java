@@ -1,4 +1,6 @@
 package game.gameobjects;
 
-public class Gameobject {
+import javafx.scene.shape.Rectangle;
+
+public class Gameobject extends Rectangle {
 }

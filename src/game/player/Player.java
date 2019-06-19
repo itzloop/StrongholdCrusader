@@ -30,6 +30,7 @@ public class Player implements requestHandler
     private final static AtomicInteger idCounter= new AtomicInteger(0);
     private final static AtomicInteger portCounter = new AtomicInteger(15152);
     private String name;
+    private transient boolean hasMap = false;
     private transient Map map;
     private transient DatagramSocket socket;
     private transient BlockingQueue<Respond>  responds;
@@ -66,6 +67,7 @@ public class Player implements requestHandler
         this.id = idCounter.getAndIncrement();
         this.port = portCounter.getAndIncrement();
         this.name = name;
+        map = new Map();
         while (true)
         {
             try {
@@ -111,8 +113,12 @@ public class Player implements requestHandler
                 servers = Optional.ofNullable(ports);
                 break;
             case PLAYER_CREATED:
-                map = new Gson().fromJson(respond.getBody() , Map.class);
-                //map.initializeTiles(map.getTilesNumber());
+                Gson gson = new Gson();
+                map = gson.fromJson(respond.getBody() , Map.class);
+                map.loadMap(map.getTilesNumber());
+                System.out.println(name + "  "+this.getMap());
+                setHasMap(true);
+                System.out.println("Player: "+hasMap);
                 break;
         }
     }
@@ -157,6 +163,15 @@ public class Player implements requestHandler
         return gson.toJson(this);
     }
 
+
+
+    public boolean hasMap() {
+        return hasMap;
+    }
+
+    public void setHasMap(boolean hasMap) {
+        this.hasMap = hasMap;
+    }
     public Map getMap() {
         return map;
     }

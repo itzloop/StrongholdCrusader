@@ -15,6 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -33,13 +34,14 @@ public class ConnectToServerController implements Initializable
     @FXML Button btnBackToMenu;
     @FXML TextField txtName;
     @FXML ComboBox cmbServerList;
-    static Player player;
+    private boolean flag = true;
     Thread fillCombobox =  new Thread(() -> {
+
             try {
-                player.handleRequest(new Request(RequestType.GET_SERVERS , player.getPort()+""));
-                while (true)
+                Menu.player.handleRequest(new Request(RequestType.GET_SERVERS , Menu.player.getPort()+""));
+                while (flag)
                 {
-                    Optional<List<Integer>> servers =  player.serverList();
+                    Optional<List<Integer>> servers =  Menu.player.serverList();
                     if(servers.isPresent())
                     {
                         System.out.println(servers.get());
@@ -55,18 +57,19 @@ public class ConnectToServerController implements Initializable
             }
     });
 
-    //TODO Fix this here and in the Player and Servers Class
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        player = Menu.player;
-        player.setName(txtName.getText());
         fillCombobox.start();
         btnConnect.setOnAction(event -> {
             try {
                 if(!cmbServerList.getSelectionModel().isEmpty())
                 {
-                    player.handleRequest(new Request(RequestType.ESTABLISHING_CONNECTION , cmbServerList.getValue().toString() ));
-                   //Menu.stage.setScene(new Scene(player.getMap().getPane()));
+                    Menu.player.setName(txtName.getText());
+                    Menu.player.handleRequest(new Request(RequestType.ESTABLISHING_CONNECTION , cmbServerList.getValue().toString() ));
+                    while (!Menu.player.hasMap()) { Thread.sleep(100); }
+                    Menu.stage.setScene(new Scene(Menu.player.getMap().getPane()));
+                    Menu.stage.setFullScreen(true);
                     Menu.stage.show();
                 }
             } catch (Exception e) {
@@ -77,6 +80,7 @@ public class ConnectToServerController implements Initializable
 
         btnBackToMenu.setOnAction(event -> {
             try {
+                flag= false;
                 Menu.stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("fxml/menu.fxml"))));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -85,4 +89,6 @@ public class ConnectToServerController implements Initializable
 
         });
     }
+
+
 }

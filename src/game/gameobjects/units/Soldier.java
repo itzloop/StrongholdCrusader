@@ -1,4 +1,4 @@
 package game.gameobjects.units;
 
-public class Soldier extends Unit {
+public class Soldier extends Citizen {
 }

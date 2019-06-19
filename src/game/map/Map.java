@@ -1,5 +1,9 @@
 package game.map;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import game.GV;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -29,6 +33,7 @@ public class Map extends Application
     private transient BorderPane borderPane;
     private transient double sceneX=0;
     private transient double sceneY=0;
+
     private transient Thread scrollOnMouseMove = new Thread(() -> {
         while (true)
         {
@@ -64,13 +69,15 @@ public class Map extends Application
     //TODO fix this so you can load this from a file
     public Map(String name , int width , int height)
     {
+        System.out.println("Map created");
         this.name = name;
         this.width = width;
         this.height = height;
         tilesNumber = new int[width][height];
         loadMap();
         tiles = new Tile[width][height];
-        init();
+        //TODO this has to move on start method so fix this later
+        //init();
     }
 
     //TODO later make this so we can load map from a file
@@ -81,6 +88,16 @@ public class Map extends Application
                 tilesNumber[i][j] = (int)(Math.random()*3);
             }
         }
+    }
+    public void loadMap(int[][] tilesNumber)
+    {
+        tiles = new Tile[width][height];
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                tiles[i][j] = tiles[i][j] = new Tile(TileType.valueOf(tilesNumber[i][j]).get(),new Vector2D(j,i));
+            }
+        }
+        init();
     }
 
     public void init()
@@ -95,7 +112,11 @@ public class Map extends Application
         for (int i = 0; i < width; i++) {
             hBox = new HBox();
             for (int j = 0; j < height; j++) {
-                tiles[i][j] = new Tile(TileType.valueOf(tilesNumber[i][j]).get(),j*30,i*30);
+                tiles[i][j] = new Tile(TileType.valueOf(tilesNumber[i][j]).get(),new Vector2D(j,i));
+                tiles[i][j].addEventHandler(MouseEvent.MOUSE_CLICKED , event -> {
+                    System.out.println(event);
+                    System.out.println(event.getTarget());
+                });
                 hBox.getChildren().add(tiles[i][j]);
             }
             vBox.getChildren().add(hBox);
@@ -117,6 +138,7 @@ public class Map extends Application
         scrollPane.addEventHandler(MouseEvent.ANY,event -> {
             sceneX = event.getSceneX();
             sceneY = event.getSceneY();
+            //System.out.println(event);
         });
         scrollOnMouseMove.start();
     }
@@ -182,10 +204,16 @@ public class Map extends Application
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Map map = new Map("Sting" , 200 , 200 );
+        Map map = new Map("Sting" , 70 , 70 );
         //System.out.println(map.toString());
-        primaryStage.setScene(new Scene(map.getPane()));
-        primaryStage.setFullScreen(true);
-        primaryStage.show();
+        Gson gson = new Gson();
+        Map map1 = gson.fromJson(gson.toJson(map) , Map.class);
+        map1.loadMap(map1.getTilesNumber());
+        System.out.println(map1);
+//        JsonElement jsonElement = gson.fromJson(gson.toJson(map) , JsonElement.class);
+//        JsonObject jsonObject = jsonElement.getAsJsonObject();
+//        primaryStage.setScene(new Scene(map.getPane()));
+//        primaryStage.setFullScreen(true);
+//        primaryStage.show();
     }
 }
