@@ -7,17 +7,16 @@ import game.comunication.Respond;
 import game.comunication.RespondType;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Servers implements requestHandler {
-    private List<Integer> ports;
+    private CopyOnWriteArrayList<Integer> ports;
     private DatagramSocket socket;
     private DatagramPacket packet;
     private BlockingQueue<Respond> responds;
@@ -32,6 +31,11 @@ public class Servers implements requestHandler {
            {
                handleRequest(requests.poll());
            }
+           try {
+               Thread.sleep(100);
+           } catch (InterruptedException e) {
+               e.printStackTrace();
+           }
        }
     });
 
@@ -43,8 +47,38 @@ public class Servers implements requestHandler {
             {
                 handleRespond(responds.poll());
             }
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     });
+
+    Thread serverChecker = new Thread(() -> {
+        System.out.println("serverChecker started...");
+        List<Integer> portsTobeRemoved = new ArrayList<>();
+        while (true)
+        {
+            for (int port : ports)
+            {
+                try {
+                    DatagramSocket s = new DatagramSocket(port);
+                    portsTobeRemoved.add(port);
+                    s.close();
+                } catch (SocketException e) {
+                }
+            }
+            ports.removeAll(portsTobeRemoved);
+            portsTobeRemoved = new ArrayList<>();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    });
+
 
     Thread server = new Thread(() -> {
         System.out.println("server has Started...");
@@ -57,17 +91,23 @@ public class Servers implements requestHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            try {
+                Thread.sleep(10);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     });
 
 
-    public Servers() throws SocketException {
+    public Servers() throws SocketException, UnknownHostException {
         buffer = new byte[GV.packetSize];
-        ports = new ArrayList<>();
-        socket = new DatagramSocket(GV.serverHolderPort);
+        ports = new CopyOnWriteArrayList<>();
+        socket = new DatagramSocket(GV.serverHolderPort , InetAddress.getLocalHost());
         responds = new ArrayBlockingQueue<>(1000);
         requests = new ArrayBlockingQueue<>(1000);
         server.start();
+        serverChecker.start();
         requestListener.start();
         respondListener.start();
     }
@@ -84,10 +124,10 @@ public class Servers implements requestHandler {
     {
         switch (respond.getRespondType())
         {
-            case SERVER_LIST_SENT:
+            case SEND_SERVER_LIST:
                 byte[] data = new Gson().toJson(respond).getBytes();
                 try {
-                    socket.send(new DatagramPacket(data , data.length , InetAddress.getLocalHost() ,respond.getReceiverPort()));
+                    socket.send(new DatagramPacket(data , data.length , respond.getReceiverIp() ,respond.getReceiverPort()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -102,12 +142,12 @@ public class Servers implements requestHandler {
             switch (request.getRequestType())
             {
                 case ADD_SERVER:
-                    ports.add(Integer.parseInt(request.getBody()));
+                    ports.add(request.getSendersPort());
+                    System.out.println("new Server Connected...");
                     break;
                 case GET_SERVERS:
                     byte[] portList = new Gson().toJson(ports).getBytes();
-                    int destPort = Integer.parseInt(request.getBody());
-                    Respond respond = new Respond(RespondType.SERVER_LIST_SENT , new String(portList),destPort);
+                    Respond respond = new Respond(request.getSendersPort(),request.getSendersIp(),RespondType.SEND_SERVER_LIST , new String(portList));
                     responds.add(respond);
                     break;
             }
@@ -115,16 +155,31 @@ public class Servers implements requestHandler {
         {
 
         }
-        System.out.println(ports);
     }
 
+    public List<Integer> getPorts() {
+        return ports;
+    }
 
 
     public static void main(String[] args) {
 
+        Scanner scanner = new Scanner(System.in);
         try {
             Servers servers = new Servers();
+            String command ;
+            while (!(command = scanner.nextLine()).equals("stop"))
+            {
+                switch (command)
+                {
+                    case "list":
+                        System.out.println(servers.getPorts());
+                        break;
+                }
+            }
         } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 

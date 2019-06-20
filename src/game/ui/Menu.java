@@ -14,11 +14,9 @@ import java.io.File;
 public class Menu extends Application
 {
     public static Stage stage;
-    static Player player;
     @Override
     public void start(Stage primaryStage) throws Exception {
         stage = primaryStage;
-        player = Player.createPlayer("").get();
         Parent root = FXMLLoader.load(getClass().getResource("fxml/menu.fxml"));
         primaryStage.setOnCloseRequest(event -> System.exit(0));
         primaryStage.setScene(new Scene(root, 600, 400));

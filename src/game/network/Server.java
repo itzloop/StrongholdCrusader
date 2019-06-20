@@ -10,11 +10,10 @@ import game.player.Player;
 import game.comunication.Request;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
+import java.net.*;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -22,27 +21,58 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server implements requestHandler
 {
-    BlockingQueue<Request> requests;
-    BlockingQueue<Respond> responds;
+    private final static AtomicInteger playerId = new AtomicInteger(0);
     private final static AtomicInteger portCounter = new AtomicInteger(15152);
-    private Map map;
-    private java.util.Map<Integer, Player> players;
-    private final int port;
-    DatagramSocket socket;
-    DatagramPacket packet = null;
-    byte[] buffer = null;
+    private int                        port;
+    private Map                        map;
+    private List<Player>               players;
+    private DatagramSocket             socket;
+    private DatagramPacket             packet = null;
+    private BlockingQueue<Request>     requests;
+    private BlockingQueue<Respond>     responds;
+    private byte[]                     buffer = null;
+
+
     Thread requestListener = new Thread(() -> {
         System.out.println("request listener has started...");
         while (true)
-        { if(!requests.isEmpty()) handleRequest(requests.poll()); }
+        { if(!requests.isEmpty())
+            handleRequest(requests.poll());
+            else {
+            try {
+                Thread.sleep(80);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        }
     });
 
     Thread respondListener = new Thread(() -> {
         System.out.println("respond listener has started...");
-        while (true) { if(!responds.isEmpty()) handleRespond(responds.poll()); }
+        while (true) {
+            if(!responds.isEmpty())
+                handleRespond(responds.poll());
+            else {
+                try {
+                    Thread.sleep(80);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     });
 
     Thread server = new Thread(() -> {
+        try {
+            //sending the request for adding this server to the list
+            Request request = new Request(port,GV.Ip, RequestType.ADD_SERVER , "add me to the list");
+            byte[] data = new Gson().toJson(request).getBytes();
+            socket.send(new DatagramPacket(data , data.length , InetAddress.getLocalHost() , GV.serverHolderPort));
+            System.out.println("socket started on port: " + port);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         while (true)
         {
             try {
@@ -67,7 +97,7 @@ public class Server implements requestHandler
         respondListener.start();
 
         //initialize the players list
-        players = new HashMap<>();
+        players = new ArrayList<>();
 
         //assign an available port to this server
         portSetter();
@@ -76,40 +106,24 @@ public class Server implements requestHandler
         //initialize the buffer byte-array with packet-size
         buffer = new byte[GV.packetSize];
 
+        server.start();
+
     }
     //assign a new port to this server
-    void portSetter()
+    private void portSetter()
     {
         while (true)
         {
             try {
-                socket = new DatagramSocket(portCounter.get());
+                socket = new DatagramSocket(portCounter.get() , InetAddress.getLocalHost());
                 break;
             } catch (SocketException e) {
                 portCounter.getAndIncrement();
                 continue;
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
             }
         }
-    }
-    public void start() {
-        try {
-            Request request = new Request(RequestType.ADD_SERVER , port + "");
-            byte[] data = new Gson().toJson(request).getBytes();
-            socket.send(new DatagramPacket(data , data.length , InetAddress.getLocalHost() , GV.serverHolderPort));
-            server.start();
-            System.out.println("socket started on port: " + port);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public BlockingQueue<Request> getRequests() {
-        return requests;
-    }
-
-
-    public int getPort() {
-        return port;
     }
 
 
@@ -141,25 +155,83 @@ public class Server implements requestHandler
 
     @Override
     public void handleRequest(Request request) {
+        Respond respond;
+
         switch (request.getRequestType()) {
-            case ESTABLISHING_CONNECTION:
+            case CONNECT_TO_SERVER:
                 Player p = new Gson().fromJson(request.getBody(), Player.class);
-                if (!players.containsKey(p.getId())) {
-                    players.put(p.getId(), p);
+                if (playerId.get() < 4) {
+                    p.setId(playerId.getAndIncrement());
+                    players.add(p);
                     System.out.println(players);
-                    Respond respond = new Respond(RespondType.PLAYER_CREATED, new Gson().toJson(map), p.getPort());
+                    respond = new Respond(p.getId(),p.getPort(),request.getSendersIp(),RespondType.PLAYER_CREATED, new Gson().toJson(map));
                     responds.add(respond);
                     break;
+                } else {
+                    respond = new Respond(p.getPort(),request.getSendersIp(),RespondType.MAX_PLAYERS_REACHED , "Max Players reached");
+                    responds.add(respond);
                 }
         }
 
 
+
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public Map getMap() {
+        return map;
+    }
+
+    public void setMap(Map map) {
+        this.map = map;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
+    }
+
+    public String getIp() throws UnknownHostException {
+        return socket.getInetAddress().getLocalHost().getHostAddress() + ":" + port;
     }
 
     public static void main(String[] args) throws SocketException {
-        Server socket = new Server();
-        socket.start();
+        Server server = new Server();
+        Scanner scanner = new Scanner(System.in);
+        String command;
+        while (!(command = scanner.nextLine()).equals("stop")) {
+            switch (command) {
+                case "players":
+                    System.out.println(server.getPlayers());
+                    break;
+                case "ip":
+                    try {
+                        System.out.println(server.getIp());
+                    }
+                    catch (NullPointerException e)
+                    {
+                        e.printStackTrace();
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+        }
+
+    }
+
+    public BlockingQueue<Request> getRequests() {
+        return requests;
+    }
 
 
+    public int getPort() {
+        return port;
     }
 }

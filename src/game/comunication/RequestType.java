@@ -4,7 +4,12 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum  RequestType {
-    ADD_SERVER(0),GET_SERVERS(1),ESTABLISHING_CONNECTION(2) , MOVE_UNIT(3);
+    //request for adding server to server list in servers class.
+    ADD_SERVER(0),
+    //request for getting all the servers available.
+    GET_SERVERS(1),
+    //a player have to sent this type of request if he wishes to connect to servers.
+    CONNECT_TO_SERVER(2);
     private final int reqNum;
 
     RequestType(int reqNum)

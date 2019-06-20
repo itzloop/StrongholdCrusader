@@ -6,16 +6,11 @@ import game.GV;
 import game.comunication.Request;
 import game.comunication.RequestType;
 import game.comunication.Respond;
-
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.*;
 import game.network.requestHandler;
 import game.map.Map;
-import game.ui.Menu;
-import javafx.scene.Scene;
-
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -27,14 +22,15 @@ public class Player implements requestHandler
 
     private int id;
     private int port;
-    private final static AtomicInteger idCounter= new AtomicInteger(0);
     private final static AtomicInteger portCounter = new AtomicInteger(15152);
     private String name;
-    private transient boolean hasMap = false;
     private transient Map map;
     private transient DatagramSocket socket;
     private transient BlockingQueue<Respond>  responds;
-    private transient Optional<List<Integer>> servers;
+    private transient Optional<List<Integer>> availableServers;
+    private transient boolean hasMap = false;
+    private transient InetAddress localHost;
+
     private final transient Thread respondListener = new Thread(() -> {
        while (true)
        {
@@ -42,8 +38,15 @@ public class Player implements requestHandler
            {
                handleRespond(responds.poll());
            }
+           try {
+               Thread.sleep(100);
+           } catch (InterruptedException e) {
+               e.printStackTrace();
+           }
        }
     });
+
+    //this will receive all the responds and add them for handling
     private final transient Thread respondHandler = new Thread(() -> {
         DatagramPacket packet;
         byte[] get = new byte[GV.packetSize];
@@ -63,42 +66,47 @@ public class Player implements requestHandler
     });
 
 
-    private Player(String name) {
-        this.id = idCounter.getAndIncrement();
-        this.port = portCounter.getAndIncrement();
+    public Player(String name , int id , int port)
+    {
+        if(port == -1)
+            this.port = getAvailablePorts();
+        else
+            this.port = port;
         this.name = name;
+        this.id = id;
         map = new Map();
-        while (true)
-        {
-            try {
-                this.socket = new DatagramSocket(port);
-            }
-            catch (SocketException e)
-            {
-                this.port = portCounter.getAndIncrement();
-                continue;
-            }
-            break;
+        try {
+            localHost = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
         }
-        servers = Optional.empty();
+        availableServers = Optional.empty();
         responds = new ArrayBlockingQueue<>(1000);
         respondListener.start();
         respondHandler.start();
     }
 
-    private Player(String name , int id , int port)
-    {
-        this.port = port;
-        this.name = name;
-        this.id = id;
+    public Player(String name) {
+        this(name , -1 , -1);
     }
 
-    //TODO fix this so we can have more than one game at a time i think im wrong but anyways :)
-    public static Optional<Player> createPlayer(String name)  {
-        if(idCounter.get() < GV.maxPlayers)
-            return Optional.ofNullable(new Player(name));
-        return Optional.empty();
+
+
+    private int getAvailablePorts()
+    {
+        while (true) {
+            try {
+                this.socket = new DatagramSocket(portCounter.get() , localHost);
+
+                return portCounter.getAndIncrement();
+            } catch (SocketException e) {
+                portCounter.getAndIncrement();
+                continue;
+            }
+        }
     }
+
+
 
 
 
@@ -107,18 +115,22 @@ public class Player implements requestHandler
     {
         switch (respond.getRespondType())
         {
-            case SERVER_LIST_SENT:
+            case SEND_SERVER_LIST:
                 Type type = new TypeToken<List<Integer>>(){}.getType();
                 List<Integer> ports = new Gson().fromJson(respond.getBody() , type);
-                servers = Optional.ofNullable(ports);
+                availableServers = Optional.ofNullable(ports);
                 break;
             case PLAYER_CREATED:
+                this.setId(respond.getReceiverId());
+                System.out.println(this);
                 Gson gson = new Gson();
                 map = gson.fromJson(respond.getBody() , Map.class);
                 map.loadMap(map.getTilesNumber());
                 System.out.println(name + "  "+this.getMap());
-                setHasMap(true);
-                System.out.println("Player: "+hasMap);
+                hasMap = true;
+                break;
+            case MAX_PLAYERS_REACHED:
+                System.out.println("Max Players Reached");
                 break;
         }
     }
@@ -129,40 +141,32 @@ public class Player implements requestHandler
             byte[] requestByte;
             switch (request.getRequestType())
             {
-                case ESTABLISHING_CONNECTION:
-                    Request req = new Request(RequestType.ESTABLISHING_CONNECTION , new Gson().toJson(this));
+                case CONNECT_TO_SERVER:
+                    Request req = new Request(getId() , getPort(),localHost,RequestType.CONNECT_TO_SERVER, new Gson().toJson(this));
                     requestByte =new Gson().toJson(req).getBytes();
-                    socket.send(new DatagramPacket(requestByte , requestByte.length , InetAddress.getLocalHost() ,Integer.parseInt(request.getBody() )));
+                    socket.send(new DatagramPacket(requestByte , requestByte.length , GV.Ip ,Integer.parseInt(request.getBody() )));
                     break;
                 case GET_SERVERS:
                     requestByte = new Gson().toJson(request).getBytes();
-                    socket.send(new DatagramPacket(requestByte , requestByte.length , InetAddress.getLocalHost() , GV.serverHolderPort));
+                    socket.send(new DatagramPacket(requestByte , requestByte.length , GV.Ip , GV.serverHolderPort));
                     break;
             }
         }catch (Exception e)
         {
-
+            e.printStackTrace();
         }
     }
 
     public Optional<List<Integer>> serverList()
     {
-        System.out.println("serverList: "+ servers);
-        if(servers.isPresent())
+        System.out.println("serverList: "+ availableServers);
+        if(availableServers.isPresent())
         {
-            return servers;
+            return availableServers;
         }
         else
             return Optional.empty();
     }
-
-
-    private String sendPlayer()
-    {
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
-
 
 
     public boolean hasMap() {
@@ -172,6 +176,14 @@ public class Player implements requestHandler
     public void setHasMap(boolean hasMap) {
         this.hasMap = hasMap;
     }
+
+    private String sendPlayer()
+    {
+        Gson gson = new Gson();
+        return gson.toJson(this);
+    }
+
+
     public Map getMap() {
         return map;
     }
@@ -196,18 +208,17 @@ public class Player implements requestHandler
         return port;
     }
 
-    public static void main(String[] args) throws SocketException {
-        Optional<Player> p = Player.createPlayer("Qazal");
-        Optional<Player> p1 = Player.createPlayer("Sina");
-        Optional<Player> p2 = Player.createPlayer("Sina");
-        if(p.isPresent())
-        {
-            List<Player> players = Arrays.asList(p.get() , p1.get() , p2.get());
-            Gson gson = new Gson();
-            System.out.println(gson.toJson(players));
-
-        }
-
-
+    public InetAddress getLocalHost() {
+        return localHost;
     }
+
+    public void setLocalHost(InetAddress localHost) {
+        this.localHost = localHost;
+    }
+
+    @Override
+    public String toString() {
+        return "id: " + id + " name: " + name + " port: " + port;
+    }
+
 }
