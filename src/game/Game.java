@@ -10,15 +10,12 @@ import java.util.List;
 
 public class Game
 {
-    private Server server;
-
+    private Player player;
     public Game(Server server)
     {
+        player = new Player("");
     }
-    public void start() throws SocketException {
-        server = new Server();
 
-    }
 
 
 

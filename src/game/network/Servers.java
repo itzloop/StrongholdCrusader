@@ -103,7 +103,7 @@ public class Servers implements requestHandler {
     public Servers() throws SocketException, UnknownHostException {
         buffer = new byte[GV.packetSize];
         ports = new CopyOnWriteArrayList<>();
-        socket = new DatagramSocket(GV.serverHolderPort , InetAddress.getLocalHost());
+        socket = new DatagramSocket(GV.serverHolderPort , GV.Ip);
         responds = new ArrayBlockingQueue<>(1000);
         requests = new ArrayBlockingQueue<>(1000);
         server.start();
@@ -127,7 +127,7 @@ public class Servers implements requestHandler {
             case SEND_SERVER_LIST:
                 byte[] data = new Gson().toJson(respond).getBytes();
                 try {
-                    socket.send(new DatagramPacket(data , data.length , respond.getReceiverIp() ,respond.getReceiverPort()));
+                    socket.send(new DatagramPacket(data , data.length , respond.getDestIp() ,respond.getReceiverPort()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -147,7 +147,7 @@ public class Servers implements requestHandler {
                     break;
                 case GET_SERVERS:
                     byte[] portList = new Gson().toJson(ports).getBytes();
-                    Respond respond = new Respond(request.getSendersPort(),request.getSendersIp(),RespondType.SEND_SERVER_LIST , new String(portList));
+                    Respond respond = new Respond(request.getSendersPort(),request.getDestIp(),RespondType.SEND_SERVER_LIST , new String(portList));
                     responds.add(respond);
                     break;
             }

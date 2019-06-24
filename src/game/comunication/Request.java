@@ -7,20 +7,20 @@ public class Request
 {
     private int         sendersId;
     private int         sendersPort;
-    private InetAddress sendersIp;
+    private InetAddress destIp;
     private RequestType requestType;
     private String      body;
 
-    public Request(int sendersId , int sendersPort, InetAddress sendersIp, RequestType requestType, String body ) {
+    public Request(int sendersId , int sendersPort, InetAddress destIp, RequestType requestType, String body ) {
         this.sendersId      = sendersId;
         this.sendersPort    = sendersPort;
-        this.sendersIp = sendersIp;
+        this.destIp = destIp;
         this.requestType    = requestType;
         this.body           = body;
     }
 
-    public Request(int sendersPort, InetAddress sendersIp, RequestType requestType, String body ){
-        this(-1 , sendersPort , sendersIp, requestType , body);
+    public Request(int sendersPort, InetAddress destIp, RequestType requestType, String body ){
+        this(-1 , sendersPort , destIp, requestType , body);
     }
 
 
@@ -44,12 +44,12 @@ public class Request
 
     public void setBody(String body) { this.body = body; }
 
-    public InetAddress getSendersIp() { return sendersIp; }
+    public InetAddress getDestIp() { return destIp; }
 
-    public void setSendersIp(InetAddress sendersIp) { this.sendersIp = sendersIp; }
+    public void setDestIp(InetAddress destIp) { this.destIp = destIp; }
 
     @Override
     public String toString() {
-        return requestType +" " + body;
+        return destIp.getHostName()+"/" + destIp.getHostAddress() + "  "+requestType +" " + body;
     }
 }

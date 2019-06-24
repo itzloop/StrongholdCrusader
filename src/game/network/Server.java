@@ -11,10 +11,7 @@ import game.comunication.Request;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -68,7 +65,7 @@ public class Server implements requestHandler
             //sending the request for adding this server to the list
             Request request = new Request(port,GV.Ip, RequestType.ADD_SERVER , "add me to the list");
             byte[] data = new Gson().toJson(request).getBytes();
-            socket.send(new DatagramPacket(data , data.length , InetAddress.getLocalHost() , GV.serverHolderPort));
+            socket.send(new DatagramPacket(data , data.length , GV.Ip , GV.serverHolderPort));
             System.out.println("socket started on port: " + port);
         } catch (IOException e) {
             e.printStackTrace();
@@ -84,6 +81,10 @@ public class Server implements requestHandler
             }
         }
     });
+
+
+
+
 
     //Constructor
     public Server()
@@ -115,13 +116,12 @@ public class Server implements requestHandler
         while (true)
         {
             try {
-                socket = new DatagramSocket(portCounter.get() , InetAddress.getLocalHost());
+                System.out.println(GV.Ip);
+                socket = new DatagramSocket(portCounter.get() , GV.Ip);
                 break;
             } catch (SocketException e) {
                 portCounter.getAndIncrement();
                 continue;
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
             }
         }
     }
@@ -132,7 +132,9 @@ public class Server implements requestHandler
         byte[] data = new byte[packet.getLength()];
         System.arraycopy(packet.getData() , 0 , data , 0 , packet.getLength());
         String requestStr = new String(data);
+
         Request request = new Gson().fromJson(requestStr , Request.class);
+        request.setDestIp(packet.getAddress());
         System.out.println(request.getBody());
         requests.add(request);
     }
@@ -144,7 +146,7 @@ public class Server implements requestHandler
             case PLAYER_CREATED:
                 buffer = new Gson().toJson(respond).getBytes();
                 try {
-                    socket.send(new DatagramPacket(buffer , buffer.length , InetAddress.getLocalHost() , respond.getReceiverPort()));
+                    socket.send(new DatagramPacket(buffer , buffer.length , respond.getDestIp() , respond.getReceiverPort()));
                     System.out.println("Respond has been sent");
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -164,11 +166,11 @@ public class Server implements requestHandler
                     p.setId(playerId.getAndIncrement());
                     players.add(p);
                     System.out.println(players);
-                    respond = new Respond(p.getId(),p.getPort(),request.getSendersIp(),RespondType.PLAYER_CREATED, new Gson().toJson(map));
+                    respond = new Respond(p.getId(),p.getPort(),request.getDestIp(),RespondType.PLAYER_CREATED, new Gson().toJson(map));
                     responds.add(respond);
                     break;
                 } else {
-                    respond = new Respond(p.getPort(),request.getSendersIp(),RespondType.MAX_PLAYERS_REACHED , "Max Players reached");
+                    respond = new Respond(p.getPort(),request.getDestIp(),RespondType.MAX_PLAYERS_REACHED , "Max Players reached");
                     responds.add(respond);
                 }
         }
@@ -197,8 +199,32 @@ public class Server implements requestHandler
         this.players = players;
     }
 
-    public String getIp() throws UnknownHostException {
-        return socket.getInetAddress().getLocalHost().getHostAddress() + ":" + port;
+    public String getIp() throws  SocketException {
+        return socket.getLocalAddress().getHostAddress() + ":" + port;
+
+//        StringBuilder s = null;
+//        try {
+//            s = new StringBuilder("ips\n"+ Inet4Address.getLocalHost().getHostAddress()+"\n");
+//        } catch (UnknownHostException e) {
+//            e.printStackTrace();
+//        }
+//        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+//        while (networkInterfaces.hasMoreElements())
+//        {
+//            NetworkInterface networkInterface = networkInterfaces.nextElement();
+//            if(networkInterface.isLoopback() || !networkInterface.isUp() || networkInterface.isVirtual())
+//                continue;
+//            Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+//            while (addresses.hasMoreElements())
+//            {
+//                InetAddress address = addresses.nextElement();
+//                if (address instanceof Inet4Address)
+//                    s.append(address.getHostAddress() + "\n");
+//            }
+//
+//        }
+
+//        return s.toString();
     }
 
     public static void main(String[] args) throws SocketException {
@@ -216,8 +242,6 @@ public class Server implements requestHandler
                     }
                     catch (NullPointerException e)
                     {
-                        e.printStackTrace();
-                    } catch (UnknownHostException e) {
                         e.printStackTrace();
                     }
                     break;

@@ -13,6 +13,7 @@ import game.network.requestHandler;
 import game.map.Map;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,7 +23,6 @@ public class Player implements requestHandler
 
     private int id;
     private int port;
-    private final static AtomicInteger portCounter = new AtomicInteger(15152);
     private String name;
     private transient Map map;
     private transient DatagramSocket socket;
@@ -30,8 +30,9 @@ public class Player implements requestHandler
     private transient Optional<List<Integer>> availableServers;
     private transient boolean hasMap = false;
     private transient InetAddress localHost;
+    private transient final static AtomicInteger portCounter = new AtomicInteger(15152);
 
-    private final transient Thread respondListener = new Thread(() -> {
+    private transient final Thread respondListener = new Thread(() -> {
        while (true)
        {
            if(!responds.isEmpty())
@@ -47,7 +48,7 @@ public class Player implements requestHandler
     });
 
     //this will receive all the responds and add them for handling
-    private final transient Thread respondHandler = new Thread(() -> {
+    private transient final   Thread respondHandler = new Thread(() -> {
         DatagramPacket packet;
         byte[] get = new byte[GV.packetSize];
         while (true)
@@ -64,7 +65,21 @@ public class Player implements requestHandler
            }
        }
     });
-
+    private transient final Thread debugger = new Thread(() -> {
+        System.out.println("Debugger has started...");
+        Scanner scanner = new Scanner(System.in);
+        String command;
+        while (!(command = scanner.nextLine()).equals("stop"))
+        {
+            switch (command)
+            {
+                case "ip":
+                    System.out.println(localHost.getHostAddress());
+                    System.out.println(localHost.getHostName());
+                    break;
+            }
+        }
+    });
 
     public Player(String name , int id , int port)
     {
@@ -84,6 +99,7 @@ public class Player implements requestHandler
         responds = new ArrayBlockingQueue<>(1000);
         respondListener.start();
         respondHandler.start();
+        debugger.start();
     }
 
     public Player(String name) {

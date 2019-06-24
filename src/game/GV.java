@@ -21,7 +21,7 @@ public class GV {
 
     static {
         try {
-            Ip = InetAddress.getLocalHost();
+            Ip = InetAddress.getByName("192.168.1.178");
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

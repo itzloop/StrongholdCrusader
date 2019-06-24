@@ -42,7 +42,7 @@ public class ConnectToServerController implements Initializable
     Thread fillCombobox =  new Thread(() -> {
 
             try {
-                player.handleRequest(new Request(player.getId() , player.getPort(), player.getLocalHost(),RequestType.GET_SERVERS , "get me all the available servers" ));
+                player.handleRequest(new Request(player.getId() , player.getPort(), GV.Ip,RequestType.GET_SERVERS , "get me all the available servers" ));
                 while (flag)
                 {
                     Optional<List<Integer>> servers =  player.serverList();
@@ -80,7 +80,6 @@ public class ConnectToServerController implements Initializable
                     Menu.stage.setY(10);
                     Menu.stage.setFullScreen(true);
                     Menu.stage.show();
-                    System.out.println(player.getLocalHost().getHostAddress());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
