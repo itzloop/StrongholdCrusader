@@ -1,6 +1,7 @@
 package game.network.communications;
 
 import com.google.gson.Gson;
+import game.GV;
 import game.network.communications.message.Message;
 import game.network.communications.message.Request;
 import game.network.communications.message.Respond;
@@ -23,8 +24,8 @@ public class Communication {
         System.out.println("Communication has started...");
 
         //initializing request and respond lists
-        requests = new ArrayBlockingQueue<>(1000);
-        responds = new ArrayBlockingQueue<>(1000);
+        requests = new ArrayBlockingQueue<>(GV.requestListSize);
+        responds = new ArrayBlockingQueue<>(GV.respondListSize);
 
         //initializing the request and respond parser
         parser = (packet) -> {

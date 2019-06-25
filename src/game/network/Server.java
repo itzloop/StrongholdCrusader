@@ -26,6 +26,7 @@ public class Server
     private DatagramSocket             server;
     private DatagramPacket             packet           = null;
     private Communication              communication;
+    private Console console;
     private final static AtomicInteger playerId         = new AtomicInteger(0);
     private final static AtomicInteger portCounter      = new AtomicInteger(15152);
 
@@ -35,50 +36,6 @@ public class Server
     {
         //initialize the map
         map = new Map("sample Map" , 70 , 70);
-
-
-        //initialize and start respond and request comunicationListener
-        Handler requestHandler = (message) -> {
-            Request request = (Request) message;
-            Respond respond = null;
-            System.out.println("new "+request.getRequestType());
-            switch (request.getRequestType()) {
-                case CONNECT_TO_SERVER:
-                    Player p = new Gson().fromJson(request.getMessage(), Player.class);
-                    if (playerId.get() < 4) {
-                        p.setId(playerId.getAndIncrement());
-                        players.add(p);
-                        System.out.println(players);
-                        respond = new Respond(p.getId(),p.getPort(),request.getDestIp(), RespondType.PLAYER_CREATED, new Gson().toJson(map));
-                        return respond;
-                    } else {
-                        respond = new Respond(p.getPort(),request.getDestIp(),RespondType.MAX_PLAYERS_REACHED , "Max Players reached");
-                        return respond;
-                    }
-            }
-            return respond;
-        };
-        Handler respondHandler = (message) -> {
-            Respond respond = (Respond) message;
-            switch (respond.getRespondType())
-            {
-                case PLAYER_CREATED:
-                    buffer = new Gson().toJson(respond).getBytes();
-                    try {
-                        server.send(new DatagramPacket(buffer , buffer.length , respond.getDestIp() , respond.getPort()));
-                        System.out.println("Respond has been sent");
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-            }
-            return null;
-        };
-        communication = new Communication(requestHandler , respondHandler);
-
-        //initialize the players list
-        System.out.println("Players list initialized");
-        players = new ArrayList<>();
 
         //initializing the Console for this server
         Function<String , Void> consoleBehavior = (command) -> {
@@ -101,7 +58,51 @@ public class Server
             }
             return null;
         };
-        new Thread(new Console(consoleBehavior)).start();
+        console = new Console(consoleBehavior);
+        new Thread(console).start();
+
+        //initialize and start respond and request communicationListener
+        Handler requestHandler = (message) -> {
+            Request request = (Request) message;
+            Respond respond = null;
+            System.out.println("new "+request.getRequestType());
+            switch (request.getRequestType()) {
+                case CONNECT_TO_SERVER:
+                    Player p = new Gson().fromJson(request.getMessage(), Player.class);
+                    if (playerId.get() < GV.maxPlayers) {
+                    p.setId(playerId.getAndIncrement());
+                    players.add(p);
+                    System.out.println(players);
+                    respond = new Respond(p.getId(),p.getPort(),request.getDestIp(), RespondType.PLAYER_CREATED, new Gson().toJson(map));
+                    return respond;
+                } else {
+                    respond = new Respond(p.getPort(),request.getDestIp(),RespondType.MAX_PLAYERS_REACHED , "Max Players reached");
+                    return respond;
+                }
+            }
+            return respond;
+        };
+        Handler respondHandler = (message) -> {
+            Respond respond = (Respond) message;
+            switch (respond.getRespondType())
+            {
+                case PLAYER_CREATED:
+                    buffer = new Gson().toJson(respond).getBytes();
+                    try {
+                        server.send(new DatagramPacket(buffer , buffer.length , respond.getDestIp() , respond.getPort()));
+                        System.out.println("Respond has been sent");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+            }
+            return null;
+        };
+        communication = new Communication(requestHandler , respondHandler);
+
+        //initialize the players list
+        console.log("Players list initialized");
+        players = new ArrayList<>();
 
         //assign an available port to this server
         portFinder();
@@ -121,7 +122,7 @@ public class Server
             Request request = new Request(port,GV.Ip, RequestType.ADD_SERVER , "add me to the list");
             byte[] data = new Gson().toJson(request).getBytes();
             server.send(new DatagramPacket(data , data.length , GV.Ip , GV.serverHolderPort));
-            System.out.println("server started on : " + getIp()+"/"+port);
+            console.log("server started on : " + getIp()+"/"+port);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -183,24 +184,6 @@ public class Server
 
     public static void main(String[] args) throws SocketException {
         Server server = new Server();
-        Scanner scanner = new Scanner(System.in);
-        String command;
-        while (!(command = scanner.nextLine()).equals("stop")) {
-            switch (command) {
-                case "players":
-                    System.out.println(server.getPlayers());
-                    break;
-                case "ip":
-                    try {
-                        System.out.println(server.getIp());
-                    }
-                    catch (NullPointerException e)
-                    {
-                        e.printStackTrace();
-                    }
-                    break;
-            }
-        }
 
     }
 

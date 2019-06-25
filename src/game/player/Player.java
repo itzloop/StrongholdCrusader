@@ -27,14 +27,13 @@ public class Player
     private int                                     port;
     private String                                  name;
     private transient Map                           map;
-    private transient DatagramSocket                socket;
+    private transient DatagramSocket                server;
     private transient Optional<List<Integer>>       availableServers;
     private transient boolean                       hasMap              = false;
-    private transient InetAddress                   localHost;
     private transient Communication                 communication;
     private transient final static AtomicInteger    portCounter         = new AtomicInteger(15152);
-
-
+    private transient Console                       console;
+    private transient Thread                        connect;
 
 
     public Player(String name , int id , int port)
@@ -46,13 +45,8 @@ public class Player
         this.name = name;
         this.id = id;
         map = new Map();
-        try {
-            localHost = InetAddress.getLocalHost();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
         availableServers = Optional.empty();
-        //initialize and start respond and request comunicationListener
+        //initialize and start respond and request communicationListener
         Handler requestHandler = (message) -> {
             Request request = (Request)message;
             try {
@@ -60,13 +54,13 @@ public class Player
                 switch (request.getRequestType())
                 {
                     case CONNECT_TO_SERVER:
-                        Request req = new Request(getId() , getPort(),localHost,RequestType.CONNECT_TO_SERVER, new Gson().toJson(this));
+                        Request req = new Request(getId() , getPort(),GV.Ip,RequestType.CONNECT_TO_SERVER, new Gson().toJson(this));
                         requestByte =new Gson().toJson(req).getBytes();
-                        socket.send(new DatagramPacket(requestByte , requestByte.length , GV.Ip ,Integer.parseInt(request.getMessage() )));
+                        server.send(new DatagramPacket(requestByte , requestByte.length , GV.Ip ,Integer.parseInt(request.getMessage() )));
                         break;
                     case GET_SERVERS:
                         requestByte = new Gson().toJson(request).getBytes();
-                        socket.send(new DatagramPacket(requestByte , requestByte.length , GV.Ip , GV.serverHolderPort));
+                        server.send(new DatagramPacket(requestByte , requestByte.length , GV.Ip , GV.serverHolderPort));
                         break;
                 }
             }catch (Exception e)
@@ -86,58 +80,55 @@ public class Player
                     break;
                 case PLAYER_CREATED:
                     this.setId(respond.getId());
-                    System.out.println(this);
+                    console.log(map.toString());
                     Gson gson = new Gson();
                     map = gson.fromJson(respond.getMessage() , Map.class);
                     map.loadMap(map.getTilesNumber());
                     hasMap = true;
                     break;
                 case MAX_PLAYERS_REACHED:
-                    System.out.println("Max Players Reached");
+                    console.log("Server is full");
                     break;
             }
             return null;
         };
         communication = new Communication(requestHandler , respondHandler);
 
-
         //initializing the Console for this server
         Function<String , Void> consoleBehavior = (command) -> {
             switch (command)
             {
                 case "ip":
-                    System.out.println(localHost.getHostAddress());
-                    System.out.println(localHost.getHostName());
+                    console.log(GV.Ip.getHostAddress());
+                    console.log(GV.Ip.getHostName());
                     break;
             }
             return null;
         };
-        new Thread(new Console(consoleBehavior)).start();
+        console = new Console(consoleBehavior);
+        new Thread(console).start();
 
-
-        //TODO think of a better way to implement this
         //start listening for responds
-        new Thread(() -> start()).start();
-
-    }
-
-    private void start() {
-        DatagramPacket packet;
-        byte[] get = new byte[GV.packetSize];
-        while (true)
-        {
-            packet = new DatagramPacket(get, get.length);
-            try {
-                socket.receive(packet);
-                byte[] data = new byte[packet.getLength()];
-                System.arraycopy(packet.getData() , 0, data , 0 , packet.getLength());
-                Respond respond = new Gson().fromJson(new String(data) , Respond.class);
-                getCommunication().communicate(respond);
-            } catch (IOException e) {
-                e.printStackTrace();
+        connect = new Thread(() -> {
+            DatagramPacket packet;
+            byte[] get = new byte[GV.packetSize];
+            while (true)
+            {
+                packet = new DatagramPacket(get, get.length);
+                try {
+                    server.receive(packet);
+                    byte[] data = new byte[packet.getLength()];
+                    System.arraycopy(packet.getData() , 0, data , 0 , packet.getLength());
+                    Respond respond = new Gson().fromJson(new String(data) , Respond.class);
+                    Communication().communicate(respond);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        });
+        connect.start();
     }
+
 
     public Player(String name) {
         this(name , -1 , -1);
@@ -149,7 +140,7 @@ public class Player
     {
         while (true) {
             try {
-                this.socket = new DatagramSocket(portCounter.get() , localHost);
+                this.server = new DatagramSocket(portCounter.get() , GV.Ip);
 
                 return portCounter.getAndIncrement();
             } catch (SocketException e) {
@@ -212,21 +203,12 @@ public class Player
         return port;
     }
 
-    public InetAddress getLocalHost() {
-        return localHost;
-    }
 
-    public void setLocalHost(InetAddress localHost) {
-        this.localHost = localHost;
-    }
-
-    public Communication getCommunication() {
+    public Communication Communication() {
         return communication;
     }
 
-    public void setCommunication(Communication communication) {
-        this.communication = communication;
-    }
+
 
     @Override
     public String toString() {

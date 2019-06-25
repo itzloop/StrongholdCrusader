@@ -55,6 +55,7 @@ public class IP {
                     }
                 }
             }
+            pro.destroy();
         }
         catch(IOException e)
         {

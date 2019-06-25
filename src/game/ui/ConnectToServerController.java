@@ -32,7 +32,7 @@ public class ConnectToServerController implements Initializable
     Thread fillCombobox =  new Thread(() -> {
 
             try {
-                player.getCommunication().communicate(new Request(player.getId() , player.getPort(), GV.Ip,RequestType.GET_SERVERS , "get me all the available servers" ));
+                player.Communication().communicate(new Request(player.getId() , player.getPort(), GV.Ip,RequestType.GET_SERVERS , "get me all the available servers" ));
                 while (flag)
                 {
                     Optional<List<Integer>> servers =  player.serverList();
@@ -63,7 +63,7 @@ public class ConnectToServerController implements Initializable
                 if(!cmbServerList.getSelectionModel().isEmpty())
                 {
                     player.setName(txtName.getText());
-                    player.getCommunication().communicate(new Request(player.getId() , player.getPort(),GV.Ip,RequestType.CONNECT_TO_SERVER , cmbServerList.getValue().toString() ));
+                    player.Communication().communicate(new Request(player.getId() , player.getPort(),GV.Ip,RequestType.CONNECT_TO_SERVER , cmbServerList.getValue().toString() ));
                     while (!player.hasMap()) { Thread.sleep(100); }
                     Menu.stage.setScene(new Scene(player.getMap().getPane()));
                     Menu.stage.setX(10);
