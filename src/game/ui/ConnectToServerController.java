@@ -14,7 +14,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -24,15 +27,16 @@ public class ConnectToServerController implements Initializable
 
     @FXML Button btnConnect;
     @FXML Button btnBackToMenu;
+    @FXML Button btnFetch;
     @FXML TextField txtName;
+    @FXML TextField txtIP;
     @FXML ComboBox cmbServerList;
-    
     private Player player;
     private boolean flag = true;
     Thread fillCombobox =  new Thread(() -> {
 
             try {
-                player.Communication().communicate(new Request(player.getId() , player.getPort(), GV.Ip,RequestType.GET_SERVERS , "get me all the available servers" ));
+                player.Communication().communicate(new Request(player.getId() , player.getPort(), player.getServerIp(),RequestType.GET_SERVERS , "get me all the available servers" ));
                 while (flag)
                 {
                     Optional<List<Integer>> servers =  player.serverList();
@@ -56,7 +60,22 @@ public class ConnectToServerController implements Initializable
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         player = new Player("");
-        fillCombobox.start();
+        btnFetch.setOnAction(event -> {
+            if(!txtIP.getText().isEmpty() && txtIP.getText().trim().matches(GV.ipFormat))
+            {
+                try {
+                    player.setServerIp(InetAddress.getByName(txtIP.getText()));
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                }
+                fillCombobox.start();
+            }
+            else
+            {
+                System.out.println("wrong input");
+            }
+        });
+
         System.out.println(GV.Ip);
         btnConnect.setOnAction(event -> {
             try {

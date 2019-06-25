@@ -32,8 +32,10 @@ public class Player
     private transient boolean                       hasMap              = false;
     private transient Communication                 communication;
     private transient final static AtomicInteger    portCounter         = new AtomicInteger(15152);
+    private transient InetAddress                   serverIp;
     private transient Console                       console;
     private transient Thread                        connect;
+
 
 
     public Player(String name , int id , int port)
@@ -54,13 +56,13 @@ public class Player
                 switch (request.getRequestType())
                 {
                     case CONNECT_TO_SERVER:
-                        Request req = new Request(getId() , getPort(),GV.Ip,RequestType.CONNECT_TO_SERVER, new Gson().toJson(this));
+                        Request req = new Request(getId() , getPort(),serverIp,RequestType.CONNECT_TO_SERVER, new Gson().toJson(this));
                         requestByte =new Gson().toJson(req).getBytes();
-                        server.send(new DatagramPacket(requestByte , requestByte.length , GV.Ip ,Integer.parseInt(request.getMessage() )));
+                        server.send(new DatagramPacket(requestByte , requestByte.length , serverIp ,Integer.parseInt(request.getMessage() )));
                         break;
                     case GET_SERVERS:
                         requestByte = new Gson().toJson(request).getBytes();
-                        server.send(new DatagramPacket(requestByte , requestByte.length , GV.Ip , GV.serverHolderPort));
+                        server.send(new DatagramPacket(requestByte , requestByte.length ,serverIp, GV.serverHolderPort));
                         break;
                 }
             }catch (Exception e)
@@ -99,8 +101,8 @@ public class Player
             switch (command)
             {
                 case "ip":
-                    console.log(GV.Ip.getHostAddress());
-                    console.log(GV.Ip.getHostName());
+                    System.out.println(serverIp.getHostAddress());
+                    System.out.println(serverIp.getHostName());
                     break;
             }
             return null;
@@ -140,7 +142,7 @@ public class Player
     {
         while (true) {
             try {
-                this.server = new DatagramSocket(portCounter.get() , GV.Ip);
+                this.server = new DatagramSocket(portCounter.get() , serverIp);
 
                 return portCounter.getAndIncrement();
             } catch (SocketException e) {
@@ -208,7 +210,13 @@ public class Player
         return communication;
     }
 
+    public InetAddress getServerIp() {
+        return serverIp;
+    }
 
+    public void setServerIp(InetAddress serverIp) {
+        this.serverIp = serverIp;
+    }
 
     @Override
     public String toString() {

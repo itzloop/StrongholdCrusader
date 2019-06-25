@@ -18,7 +18,7 @@ public class GV {
     public static final int          requestListSize     = 100;
     public static final int          respondListSize     = 100;
     public static final double       scrollOffset        = 0.03;
-    public static final String       ipFormat            = "(0[0-9]{2}|1[0-9]{2}|2[0-5]{2})\\.(0[0-9]{2}|1[0-9]{2}|2[0-5]{2})\\.(0[0-9]{2}|1[0-9]{2}|2[0-5]{2})\\.(0[0-9]{2}|1[0-9]{2}|2[0-5]{2})";
+    public static final String       ipFormat            = "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b";
 
     public static       InetAddress  Ip;
 
