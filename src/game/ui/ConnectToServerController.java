@@ -1,13 +1,9 @@
 package game.ui;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import game.GV;
 import game.player.Player;
-import game.comunication.Request;
-import game.comunication.RequestType;
-import javafx.application.Application;
-import javafx.application.Platform;
+import game.network.communications.message.Request;
+import game.network.communications.message.RequestType;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,15 +12,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -42,7 +32,7 @@ public class ConnectToServerController implements Initializable
     Thread fillCombobox =  new Thread(() -> {
 
             try {
-                player.handleRequest(new Request(player.getId() , player.getPort(), GV.Ip,RequestType.GET_SERVERS , "get me all the available servers" ));
+                player.getCommunication().communicate(new Request(player.getId() , player.getPort(), GV.Ip,RequestType.GET_SERVERS , "get me all the available servers" ));
                 while (flag)
                 {
                     Optional<List<Integer>> servers =  player.serverList();
@@ -73,7 +63,7 @@ public class ConnectToServerController implements Initializable
                 if(!cmbServerList.getSelectionModel().isEmpty())
                 {
                     player.setName(txtName.getText());
-                    player.handleRequest(new Request(player.getId() , player.getPort(),GV.Ip,RequestType.CONNECT_TO_SERVER , cmbServerList.getValue().toString() ));
+                    player.getCommunication().communicate(new Request(player.getId() , player.getPort(),GV.Ip,RequestType.CONNECT_TO_SERVER , cmbServerList.getValue().toString() ));
                     while (!player.hasMap()) { Thread.sleep(100); }
                     Menu.stage.setScene(new Scene(player.getMap().getPane()));
                     Menu.stage.setX(10);

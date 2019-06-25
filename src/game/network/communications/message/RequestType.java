@@ -1,4 +1,4 @@
-package game.comunication;
+package game.network.communications.message;
 
 import java.util.Arrays;
 import java.util.Optional;

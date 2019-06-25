@@ -1,6 +1,6 @@
 package game;
 
-import javafx.stage.Screen;
+import game.network.IP;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -21,7 +21,7 @@ public class GV {
 
     static {
         try {
-            Ip = InetAddress.getByName("192.168.1.178");
+            Ip = InetAddress.getByName(IP.getIP());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
