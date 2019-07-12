@@ -27,23 +27,24 @@ public class AssetManager {
 
 
             //btnDefense Contents
-//            assets.put("toolbar-btn-defense-1" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img18.png")));
-//            assets.put("toolbar-btn-defense-2" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img14.png")));
-//            assets.put("toolbar-btn-defense-3" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img16.png")));
-//            assets.put("toolbar-btn-defense-4" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img12.png")));
-            assets.put("toolbar-btn-defense-5" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/collection25.png")));
-            assets.put("toolbar-btn-defense-6" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/collection21.png")));
-            assets.put("toolbar-btn-defense-7" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/collection23.png")));
+            assets.put("toolbar-btn-defense-1" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img18.png")));
+            assets.put("toolbar-btn-defense-2" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img14.png")));
+            assets.put("toolbar-btn-defense-3" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img16.png")));
+            assets.put("toolbar-btn-defense-4" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img12.png")));
+            assets.put("toolbar-btn-defense-5" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img98.png")));
+            assets.put("toolbar-btn-defense-6" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img96.png")));
+            assets.put("toolbar-btn-defense-7" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img100.png")));
+
 
 
             //actual defense buildings
-            assets.put("building-defense-1" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img18.png")));
-            assets.put("building-defense-2" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img14.png")));
-            assets.put("building-defense-3" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img16.png")));
-            assets.put("building-defense-4" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img12.png")));
-            assets.put("building-defense-5" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img98.png")));
-            assets.put("building-defense-6" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img96.png")));
-            assets.put("building-defense-7" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img100.png")));
+//            assets.put("building-defense-1" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img18.png")));
+//            assets.put("building-defense-2" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img14.png")));
+//            assets.put("building-defense-3" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img16.png")));
+//            assets.put("building-defense-4" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img12.png")));
+            assets.put("building-defense-5" , new Image(new FileInputStream("Resources/Tiles2/tile_buildings2.gm1/collection25.png")));
+            assets.put("building-defense-6" , new Image(new FileInputStream("Resources/Tiles2/tile_buildings2.gm1/collection21.png")));
+            assets.put("building-defense-7" , new Image(new FileInputStream("Resources/Tiles2/tile_buildings2.gm1/collection23.png")));
 
             //btnIndustry Contents
             assets.put("toolbar-btn-industry-1" , new Image(new FileInputStream("Resources/Misc/icons_placeholders.gm1/0_0img38.png")));
