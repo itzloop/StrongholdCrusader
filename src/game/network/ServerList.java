@@ -11,6 +11,7 @@ import game.network.communications.message.RespondType;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -73,6 +74,22 @@ public class ServerList  {
                     byte[] portList = new Gson().toJson(ports).getBytes();
                     Respond respond = new Respond(request.getPort(),request.getDestIp(),RespondType.SEND_SERVER_LIST , new String(portList));
                     return respond;
+                case DISCONNECT_ME:
+                    List<Integer> portsTobeRemoved = new ArrayList<>();
+                    for (int port : ports)
+                    {
+                        if(port == request.getPort())
+                            portsTobeRemoved.add(port);
+                        System.out.println("Sever on port " + port + " disconnected");
+                    }
+                    ports.removeAll(portsTobeRemoved);
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    break;
             }
             return null;
         };
@@ -106,11 +123,12 @@ public class ServerList  {
         };
         new Thread(new game.network.console.Console(consoleBehavior)).start();
 
+        //start servers status checker
+        serverChecker.start();
+
         //Start the server
         start();
 
-        //start servers status checker
-        serverChecker.start();
     }
 
     private void start() {

@@ -17,7 +17,7 @@ public class Communication {
     private Handler                     respondHandler;
     private BlockingQueue<Request>      requests;
     private BlockingQueue<Respond>      responds;
-
+    private transient boolean           connected = true;
 
     public Communication(Handler requestHandler , Handler respondHandler){
 
@@ -53,26 +53,29 @@ public class Communication {
         //initializing the request and respond listeners
         requestListener = new Thread(() -> {
             System.out.println("request listener has started...");
-            while (true)
-            { if(!requests.isEmpty())
+            while (isConnected())
             {
-                Message message = requestHandler.handle(requests.poll());
-                if(message instanceof Respond)
-                    responds.add((Respond) message);
+                if(!requests.isEmpty()) {
+                    Message message = requestHandler.handle(requests.poll());
+                    if(message instanceof Respond)
+                        responds.add((Respond) message);
+                    if(message instanceof Request)
+                        requests.add((Request) message);
 
-            }
-            else {
-                try {
-                    Thread.sleep(80);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                }
+                else {
+                    try {
+                        Thread.sleep(80);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-            }
+            System.out.println("request listener stopped");
         });
         respondListener = new Thread(() -> {
             System.out.println("respond listener has started...");
-            while (true) {
+            while (isConnected()) {
                 if(!responds.isEmpty())
                     respondHandler.handle(responds.poll());
                 else {
@@ -83,6 +86,7 @@ public class Communication {
                     }
                 }
             }
+            System.out.println("respond listener stopped");
         });
 
         requestListener.start();
@@ -92,9 +96,7 @@ public class Communication {
     }
 
 
-    public Parser getParser() {
-        return parser;
-    }
+    public Parser getParser() { return parser; }
 
     public void communicate(Message m )
     {
@@ -102,5 +104,14 @@ public class Communication {
             requestHandler.handle(m);
         else
             respondHandler.handle(m);
+    }
+
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
     }
 }

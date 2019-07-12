@@ -10,7 +10,6 @@ import game.network.communications.message.Respond;
 import game.network.communications.message.RespondType;
 import game.network.console.Console;
 import game.player.Player;
-
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
@@ -26,16 +25,16 @@ public class Server
     private DatagramSocket             server;
     private DatagramPacket             packet           = null;
     private Communication              communication;
-    private Console console;
+    private Console                    console;
     private final static AtomicInteger playerId         = new AtomicInteger(0);
     private final static AtomicInteger portCounter      = new AtomicInteger(15152);
-
 
     //Constructor
     public Server()
     {
         //initialize the map
-        map = new Map("sample Map" , 70 , 70);
+        map = new Map("sample Map" , 100 , 100);
+
 
         //initializing the Console for this server
         Function<String , Void> consoleBehavior = (command) -> {
@@ -53,8 +52,18 @@ public class Server
                     }
                     break;
                 case "stop":
-                    //TODO make the server stop by adding flags to Threads
+                    Request request = new Request(GV.port , GV.Ip ,RequestType.DISCONNECT_ME , "disconnect me" );
+                    byte[] bytes = new Gson().toJson(request).getBytes();
+                    try {
+                        server.send(new DatagramPacket(bytes , bytes.length , GV.Ip , GV.serverHolderPort));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    communication.setConnected(false);
+                    console.setConnected(false);
+                    System.exit(0);
                     break;
+
             }
             return null;
         };
@@ -71,7 +80,7 @@ public class Server
                     Player p = new Gson().fromJson(request.getMessage(), Player.class);
                     if (playerId.get() < GV.maxPlayers) {
                     p.setId(playerId.getAndIncrement());
-                    players.add(p);
+                    players.add(p.getId(),p);
                     System.out.println(players);
                     respond = new Respond(p.getId(),p.getPort(),request.getDestIp(), RespondType.PLAYER_CREATED, new Gson().toJson(map));
                     return respond;
@@ -79,6 +88,10 @@ public class Server
                     respond = new Respond(p.getPort(),request.getDestIp(),RespondType.MAX_PLAYERS_REACHED , "Max Players reached");
                     return respond;
                 }
+                case DISCONNECT_ME:
+                    System.out.println(players.get(request.getId()) + " removed");
+                    System.out.println(players.remove(request.getId()));
+                    break;
             }
             return respond;
         };
@@ -101,7 +114,7 @@ public class Server
         communication = new Communication(requestHandler , respondHandler);
 
         //initialize the players list
-        console.log("Players list initialized");
+        System.out.println("Players list initialized");
         players = new ArrayList<>();
 
         //assign an available port to this server
@@ -122,11 +135,11 @@ public class Server
             Request request = new Request(port,GV.Ip, RequestType.ADD_SERVER , "add me to the list");
             byte[] data = new Gson().toJson(request).getBytes();
             server.send(new DatagramPacket(data , data.length , GV.Ip , GV.serverHolderPort));
-            console.log("server started on : " + getIp()+"/"+port);
+            System.out.println("server started on : " + getIp()+"/"+port);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        while (true)
+        while (communication.isConnected())
         {
             try {
                 packet = new DatagramPacket(buffer , buffer.length);

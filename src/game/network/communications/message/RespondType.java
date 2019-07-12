@@ -9,7 +9,7 @@ public enum  RespondType {
     //this respond is sent to the player when he requests for the available serves.
     SEND_SERVER_LIST(1),
     //this respond is sent when a players wants to connect to this server but its full.
-    MAX_PLAYERS_REACHED(3);
+    MAX_PLAYERS_REACHED(2);
     private final int resNum;
 
     RespondType(int resNum) { this.resNum = resNum; }

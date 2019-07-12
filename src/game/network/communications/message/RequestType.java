@@ -9,7 +9,8 @@ public enum  RequestType {
     //request for getting all the servers available.
     GET_SERVERS(1),
     //a player have to sent this type of request if he wishes to connect to servers.
-    CONNECT_TO_SERVER(2);
+    CONNECT_TO_SERVER(2),
+    DISCONNECT_ME(3);
     private final int reqNum;
 
     RequestType(int reqNum)

@@ -26,6 +26,7 @@ public class Player
     private int                                     id;
     private int                                     port;
     private String                                  name;
+    private transient int                           serverPort;
     private transient Map                           map;
     private transient DatagramSocket                server;
     private transient Optional<List<Integer>>       availableServers;
@@ -35,7 +36,7 @@ public class Player
     private transient InetAddress                   serverIp;
     private transient Console                       console;
     private transient Thread                        connect;
-
+    private transient Thread                        disconnect;
 
 
     public Player(String name , int id , int port)
@@ -58,11 +59,16 @@ public class Player
                     case CONNECT_TO_SERVER:
                         Request req = new Request(getId() , getPort(),serverIp,RequestType.CONNECT_TO_SERVER, new Gson().toJson(this));
                         requestByte =new Gson().toJson(req).getBytes();
-                        server.send(new DatagramPacket(requestByte , requestByte.length , serverIp ,Integer.parseInt(request.getMessage() )));
+                        server.send(new DatagramPacket(requestByte , requestByte.length , serverIp ,getServerPort()));
                         break;
                     case GET_SERVERS:
                         requestByte = new Gson().toJson(request).getBytes();
                         server.send(new DatagramPacket(requestByte , requestByte.length ,serverIp, GV.serverHolderPort));
+                        break;
+                    case DISCONNECT_ME:
+                        requestByte = new Gson().toJson(request).getBytes();
+                        server.send(new DatagramPacket(requestByte , requestByte.length ,serverIp, getServerPort()));
+                        communication.setConnected(false);
                         break;
                 }
             }catch (Exception e)
@@ -82,14 +88,13 @@ public class Player
                     break;
                 case PLAYER_CREATED:
                     this.setId(respond.getId());
-                    console.log(map.toString());
                     Gson gson = new Gson();
                     map = gson.fromJson(respond.getMessage() , Map.class);
                     map.loadMap(map.getTilesNumber());
                     hasMap = true;
                     break;
                 case MAX_PLAYERS_REACHED:
-                    console.log("Server is full");
+                    System.out.println("Server is full");
                     break;
             }
             return null;
@@ -128,6 +133,14 @@ public class Player
                 }
             }
         });
+        disconnect = new Thread(() -> {
+            Request request = new Request(getId() , getPort() , serverIp , RequestType.DISCONNECT_ME , new Gson().toJson(this));
+            Communication().communicate(request);
+            console.setConnected(false);
+            System.out.println("disconnected");
+        });
+
+        Runtime.getRuntime().addShutdownHook(disconnect);
         connect.start();
     }
 
@@ -216,6 +229,14 @@ public class Player
 
     public void setServerIp(InetAddress serverIp) {
         this.serverIp = serverIp;
+    }
+
+    public int getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
     }
 
     @Override

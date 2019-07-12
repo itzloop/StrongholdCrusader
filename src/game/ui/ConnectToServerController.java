@@ -82,7 +82,8 @@ public class ConnectToServerController implements Initializable
                 if(!cmbServerList.getSelectionModel().isEmpty())
                 {
                     player.setName(txtName.getText());
-                    player.Communication().communicate(new Request(player.getId() , player.getPort(),GV.Ip,RequestType.CONNECT_TO_SERVER , cmbServerList.getValue().toString() ));
+                    player.setServerPort(Integer.parseInt(cmbServerList.getValue().toString()));
+                    player.Communication().communicate(new Request(player.getId() , player.getPort(),GV.Ip,RequestType.CONNECT_TO_SERVER , "i wanna play connect me" ));
                     while (!player.hasMap()) { Thread.sleep(100); }
                     Menu.stage.setScene(new Scene(player.getMap().getPane()));
                     Menu.stage.setX(10);
