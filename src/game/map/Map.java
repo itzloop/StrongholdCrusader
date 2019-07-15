@@ -82,7 +82,6 @@ public class Map extends Application
                     toolbar.setCurrentKey("");
                 }else if(event.getButton() == MouseButton.PRIMARY && Optional.ofNullable(toolbar.getCurrentGameObject()).isPresent())
                 {
-
                     if(i % 2 == 0)
                     {
                         tiles[i][j].setPlacedGameobject(toolbar.getCurrentGameObject().getGameObjectHelper());
