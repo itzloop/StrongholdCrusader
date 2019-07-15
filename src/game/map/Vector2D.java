@@ -1,12 +1,20 @@
 package game.map;
 
-public class Vector2D {
+import java.util.Comparator;
+
+public class Vector2D  {
     private double x , y;
+
     public Vector2D(double x , double y)
     {
         this.x = x;
         this.y = y;
     }
+    public Vector2D()
+    {
+        this(0 , 0);
+    }
+
 
     public double getX() {
         return x;
@@ -24,13 +32,26 @@ public class Vector2D {
         this.y = y;
     }
 
-    @Override
-    public String toString() {
-        return  "(" + x + " , " + y + ")";
-    }
 
     public void set(double x, double y) {
         this.x = x;
         this.y = y;
     }
+
+    public Vector2D clone()  {
+        return new Vector2D(this.x , this.y);
+    }
+
+    @Override
+    public String toString() {
+        return  "(" + x + " , " + y + ")";
+    }
+
+
+
+    public boolean compareTo(Vector2D that)
+    {
+        return this.y > that.y;
+    }
+
 }

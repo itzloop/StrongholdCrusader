@@ -2,103 +2,55 @@ package game.map;
 
 import game.AssetManager;
 import game.GV;
-import game.gameobjects.Gameobject;
-import javafx.scene.Group;
-import javafx.scene.image.Image;
+import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 
-public class Tile extends Group
+public class Tile extends ImageView
 {
 
 
 
 
     private TileType tileType;
-    private ImageView image;
-    private Rectangle rectangle;
-    private Vector2D location;
-    public Tile(TileType tileType ,Vector2D location) {
-        this.tileType = tileType;
-        this.location = location;
-        Image img;
-        image = new ImageView();
-        image.setFitWidth(GV.tileSize.getX());
-        image.setFitHeight(GV.tileSize.getY());
-        super.setLayoutX(location.getX());
-        super.setLayoutY(location.getY());
-        image.setX(location.getX());
-        image.setY(location.getY());
-
+    private Vector2D coordinate;
+    private Vector2D pos;
+    private GameObjectHelper placedGameobject;
+    public Tile(TileType tileType ,Vector2D location , double x , double y) {
+        super();
         switch (tileType)
         {
             case DUST:
-                image.setImage(AssetManager.assets.get("dust"));
+                super.setImage(AssetManager.assets.get("dust"));
                 break;
             case MOUNTAIN:
 
-                image.setImage(AssetManager.assets.get("dust"));
+                super.setImage(AssetManager.assets.get("dust"));
                 break;
             case SEA:
 
-                image.setImage(AssetManager.assets.get("dust"));
+                super.setImage(AssetManager.assets.get("dust"));
                 break;
         }
-        super.getChildren().add(image);
+
+        this.tileType = tileType;
+        this.coordinate = location;
+
+        this.pos = new Vector2D(x + GV.tileSize.getX()/2 , y+ GV.tileSize.getY()/2);
+        super.setX(x);
+        super.setY(y);
+        super.setFitWidth(GV.tileSize.getX());
+        super.setFitHeight(GV.tileSize.getY());
     }
 
 
+    public GameObjectHelper getPlacedGameobject() {
+        return placedGameobject;
+    }
 
-//
-//    private TileType tileType;
-//    private Polygon polygon;
-//    private Gameobject gameobject;
-//    private Vector2D locatoion;
-//    public Tile(TileType tileType ,Vector2D location) {
-//        this.tileType = tileType;
-//        this.locatoion = location;
-//        Image img;
-//        polygon = myShape(location);
-//        super.setLayoutX(location.getX());
-//        super.setLayoutY(location.getY());
-//
-//
-////        switch (tileType)
-////        {
-////            case DUST:
-////                polygon.setFill(AssetManager.assets.get("dust"));
-////                break;
-////            case MOUNTAIN:
-////
-////                rectangle.setImage(AssetManager.assets.get("dust"));
-////                break;
-////            case SEA:
-////
-////                rectangle.setImage(AssetManager.assets.get("dust"));
-////                break;
-////        }
-//        super.getChildren().add(polygon);
-//    }
-//
-//
-//    public Polygon myShape(Vector2D center)
-//    {
-//        Polygon diamond = new Polygon(new double[]{
-//                center.getX() ,center.getY() - GV.tileSize.getY()/2,
-//                center.getX()+GV.tileSize.getX()/2 , center.getY(),
-//                center.getX() , center.getY() + GV.tileSize.getY()/2,
-//                center.getX()-GV.tileSize.getX()/2 , center.getY()
-//        });
-//        diamond.setFill(new ImagePattern(AssetManager.assets.get("dust")));
-//        return diamond;
-//    }
-//
-
-
+    public void setPlacedGameobject(GameObjectHelper placedGameobject) {
+        this.placedGameobject = placedGameobject;
+    }
 
     public TileType getTileType() {
         return tileType;
@@ -108,8 +60,26 @@ public class Tile extends Group
         this.tileType = tileType;
     }
 
+    public Vector2D getCoordinate() {
+        return coordinate;
+    }
+
+    public void setCoordinate(double x, double y) {
+        this.coordinate.set(x , y);
+    }
+
+    public void setPos(double x , double y) {
+        this.pos.set(x ,y);
+        this.setX(x);
+        this.setY(y);
+    }
+
+    public Vector2D getPos() {
+        return pos;
+    }
+
     @Override
     public String toString() {
-        return "[source = pane , " + "tile type = " + tileType + " , location = " + location;
+        return "[source = pane , " + "tile type = " + tileType + " , coordinate = " + coordinate + " , pos = " + pos;
     }
 }

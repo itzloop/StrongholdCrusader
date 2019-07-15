@@ -1,5 +1,7 @@
 package game.map.components;
 
+import game.Game;
+import game.gameobjects.GameObject;
 import game.map.Vector2D;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -7,11 +9,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import javax.swing.text.html.ImageView;
+import java.util.Iterator;
 import java.util.List;
 
 public class DragComponent {
     private Pane pane;
-    public DragComponent(Pane pane)
+
+    public DragComponent(Pane pane )
     {
         this.pane = pane;
         Vector2D dragStartPosition = new Vector2D(0 , 0);

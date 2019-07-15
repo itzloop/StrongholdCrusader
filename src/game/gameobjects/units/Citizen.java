@@ -1,6 +1,6 @@
 package game.gameobjects.units;
 
-import game.gameobjects.Gameobject;
+import game.gameobjects.GameObject;
 
-public class Citizen extends Gameobject {
+public class Citizen {
 }

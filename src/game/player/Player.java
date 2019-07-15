@@ -21,9 +21,8 @@ import java.util.function.Function;
 
 public class Player
 {
-
-
     private int                                     id;
+    private int                                     population;
     private int                                     port;
     private String                                  name;
     private transient int                           serverPort;

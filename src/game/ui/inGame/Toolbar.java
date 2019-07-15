@@ -1,210 +1,352 @@
 package game.ui.inGame;
 
 import game.AssetManager;
+import game.GV;
+import game.gameobjects.GameObject;
+import game.gameobjects.buildings.Castle;
+import game.gameobjects.buildings.Food.*;
+import game.gameobjects.buildings.defense.Armory;
+import game.gameobjects.buildings.defense.Barracks;
+import game.gameobjects.buildings.defense.MercenaryPost;
+import game.gameobjects.buildings.farm.*;
+import game.gameobjects.buildings.industry.*;
+import game.gameobjects.buildings.military.*;
+import game.gameobjects.buildings.townBuilding.*;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.stage.Screen;
+
+import java.util.Map;
+import java.util.Optional;
 
 public class Toolbar extends Group {
     private Pane mainContent;
-    private Pane mainToolbar;
-    private Pane defense;
-    private Pane industry;
-    private Pane farm;
-    private Pane home;
-    private Pane military;
-    private Pane food;
+    private Pane pane;
     private double width;
     private double height;
-    public Toolbar()
+    private int[] counts = {8 , 8 , 6 , 6,6 , 6};
+    private String[] keys =
+            {"defense",
+            "industry",
+            "farm",
+            "home",
+            "military",
+            "food"};
+    private Map<Integer ,GameObject> gameObjects;
+    private GameObject currentGameObject;
+    private int currentIndex;
+    private String currentKey;
+    private boolean waitingToBePlaced;
+    private Label lblGold;
+    private Label lblPopularity;
+    private Label lblPopulation;
+
+
+
+    public Toolbar(Pane pane , Map<Integer , GameObject> gameObjects)
     {
-        mainToolbar = new Pane();
-        defense = new Pane();
-        industry = new Pane();
-        farm = new Pane();
-        home = new Pane();
-        military = new Pane();
-        food = new Pane();
+
+
         mainContent = new Pane();
+        this.pane = pane;
+        this.gameObjects = gameObjects;
+        lblGold = new Label(Castle.getGold().get() + "");
+        lblGold.setStyle("-fx-font-size: 15;");
+        lblGold.setTextFill(Color.BLACK);
+        lblPopularity = new Label(Castle.getPopularity().get() + "");
+        lblPopularity.setStyle("-fx-font-size: 15;");
+        lblPopularity.setStyle("-fx-font-size: 15;");
+        lblPopularity.setTextFill(Color.GREEN);
+        lblPopulation = new Label(Castle.getCurrentPopulation().get() + "/" + Castle.getMaxPopulationSize().get());
+        lblPopulation.setStyle("-fx-font-size: 15;");
+        VBox texts = new VBox(lblPopularity , lblGold , lblPopulation);
+        texts.setLayoutX(1255);
+        texts.setLayoutY(60);
+        texts.setRotate(13);
+        texts.setAlignment(Pos.CENTER);
+
+        //load the images
         ImageView backgroundImage = new ImageView(AssetManager.assets.get("toolbar"));
         ImageView backgroundFill= new ImageView(AssetManager.assets.get("toolbar-fill"));
-        ImageView btnDefense = new ImageView(AssetManager.assets.get("toolbar-btn-defense"));
-        ImageView btnIndustry = new ImageView(AssetManager.assets.get("toolbar-btn-industry"));
-        ImageView btnFarm = new ImageView(AssetManager.assets.get("toolbar-btn-farm"));
-        ImageView btnHome = new ImageView(AssetManager.assets.get("toolbar-btn-home"));
-        ImageView btnMilitary = new ImageView(AssetManager.assets.get("toolbar-btn-military"));
-        ImageView btnFood = new ImageView(AssetManager.assets.get("toolbar-btn-food"));
-        setMainContent();
-        backgroundImage.setFitWidth(backgroundImage.getImage().getWidth()*1.5);
-        backgroundImage.setFitHeight(backgroundImage.getImage().getHeight()*1.5);
+        ImageView[] buttons = new ImageView[keys.length];
+        for (int i = 0; i < buttons.length; i++) {
+            buttons[i] = new ImageView(AssetManager.assets.get("toolbar-btn-"+keys[i]));
+        }
+
+        //layout setup
+        backgroundImage.setFitWidth(backgroundImage.getImage().getWidth());
+        backgroundImage.setFitHeight(backgroundImage.getImage().getHeight());
         backgroundImage.setX((Screen.getPrimary().getBounds().getWidth() - backgroundImage.getFitWidth())/2);
-        backgroundFill.setFitHeight(backgroundImage.getFitHeight());
+        backgroundFill.setY(backgroundImage.getImage().getHeight() - backgroundFill.getImage().getHeight());
         this.width = backgroundImage.getFitWidth();
         this.height = backgroundImage.getFitHeight();
-        double length = btnDefense.getImage().getWidth();
         HBox hBox = new HBox();
-        hBox.getChildren().addAll(btnDefense,btnIndustry,btnFarm,btnHome,btnMilitary,btnFood);
+        hBox.getChildren().addAll(buttons);
         hBox.setLayoutX(backgroundImage.getX());
-        hBox.setLayoutY(this.getHeight() - btnDefense.getImage().getHeight());
+        hBox.setLayoutY(this.getHeight() - buttons[0].getImage().getHeight());
         hBox.setPadding(new Insets(0 , 0, 0 , 30 ));
-        hBox.setSpacing(30);
+        hBox.setSpacing(25);
 
+        //add click event for buttons
+        for (int i = 0; i < buttons.length; i++) {
+            addClickEvent(buttons[i] , i);
+        }
 
-        btnDefense.setOnMouseClicked(event -> {
-            mainContent.getChildren().clear();
-            mainContent.getChildren().add(defense);
-        });
-        btnIndustry.setOnMouseClicked(event -> {
-            mainContent.getChildren().clear();
-            mainContent.getChildren().add(industry);
-        });
-        btnFarm.setOnMouseClicked(event -> {
-            mainContent.getChildren().clear();
-            mainContent.getChildren().add(farm);
-        });
-        btnHome.setOnMouseClicked(event -> {
-            mainContent.getChildren().clear();
-            mainContent.getChildren().add(home);
-        });
-        btnMilitary.setOnMouseClicked(event -> {
-            mainContent.getChildren().clear();
-            mainContent.getChildren().add(military);
-        });
-        btnFood.setOnMouseClicked(event -> {
-            mainContent.getChildren().clear();
-            mainContent.getChildren().add(food);
-        });
-
-
-        //mainContent.setBackground(new Background(new BackgroundFill(Color.BLACK , null , null)));
+        //more layout setup
         mainContent.setLayoutX(backgroundImage.getX()+20);
-        mainContent.setMinWidth(500*1.5);
-        mainContent.setMinHeight(100*1.5);
+        mainContent.setMinWidth(500);
+        mainContent.setMinHeight(100);
         mainContent.setLayoutY(backgroundImage.getLayoutY() + 35);
-        mainToolbar.getChildren().addAll(backgroundFill, backgroundImage ,mainContent , hBox);
-        this.getChildren().addAll(mainToolbar);
+        this.getChildren().addAll(backgroundFill, backgroundImage ,mainContent,hBox , texts);
 
     }
 
+    private void addClickEvent(ImageView imageView , int i)
+    {
+        imageView.setOnMouseClicked(event -> {
+            mainContent.getChildren().clear();
+            loadImages(keys[i] , counts[i]);
+        });
+    }
 
-    private void setMainContent() {
 
-
-
-        //defense Building
-        HBox defenseHBox = new HBox();
-        for (int i = 1; i <8; i++) {
-            ImageView imageView = new ImageView(AssetManager.assets.get("toolbar-btn-defense-"+i));
+    private void loadImages(String key , int count)
+    {
+        HBox hBox = new HBox();
+        for (int i = 1; i <count; i++) {
+            ImageView imageView = new ImageView(AssetManager.assets.get("toolbar-btn-"+key + "-" + i));
+            imageView.setFitWidth(50);
+            imageView.setFitHeight(50);
             int finalI = i;
             imageView.setOnMouseClicked(event -> {
-                String s = "toolbar-btn-defense-"+ finalI;
-                System.out.println(s);
+                try {
+
+                    GameObject gameObject = createObject(key , finalI);
+                    if(!Optional.ofNullable(gameObject).isPresent())
+                        throw new Exception("game object is null with id: " + key+"-"+finalI);
+                    currentIndex = finalI;
+                    currentKey = key;
+                    gameObjects.put(gameObject.getObjectId() , gameObject);
+                    if(Optional.ofNullable(currentGameObject).isPresent())
+                        this.pane.getChildren().remove(currentGameObject);
+                    currentGameObject = gameObject;
+                    this.pane.getChildren().add(gameObject);
+                    this.waitingToBePlaced = true;
+                }catch (Exception e)
+                { e.printStackTrace(); }
             });
-            defenseHBox.getChildren().add(imageView);
+
+
+            hBox.getChildren().add(imageView);
         }
-        defenseHBox.setPadding(new Insets(30, 0, 0 , 20));
-        defenseHBox.setSpacing(30);
-        defense.getChildren().add(defenseHBox);
+        hBox.setPadding(new Insets(20, 0, 0 , 10));
+        hBox.setSpacing(20);
+        mainContent.getChildren().addAll(hBox);
+    }
 
-
-        //industry Building
-        HBox industryHBox = new HBox();
-        for (int i = 1; i <8; i++) {
-            ImageView imageView = new ImageView(AssetManager.assets.get("toolbar-btn-industry-"+i));
-            int finalI = i;
-            imageView.setOnMouseClicked(event -> {
-                String s = "toolbar-btn-industry-"+ finalI;
-                System.out.println(s);
-            });
-            industryHBox.getChildren().add(imageView);
+    public GameObject createObject(String key , int id) {
+        switch (key)
+        {
+            case"defense":
+                return createDefenseBuilding(id);
+            case "industry":
+                return createIndustryBuilding(id);
+            case"farm":
+                return createFarmBuilding(id);
+            case "home":
+                return createHomeBuilding(id);
+            case"military":
+                return createMilitaryBuilding(id);
+            case"food":
+                return createFoodBuilding(id);
+                default:
+                    return null;
         }
-        industryHBox.setPadding(new Insets(30, 0, 0 , 20));
-        industryHBox.setSpacing(30);
-        industry.getChildren().add(industryHBox);
+    }
 
-
-        //farm Building
-        HBox farmHBox = new HBox();
-        for (int i = 1; i <6; i++) {
-            ImageView imageView = new ImageView(AssetManager.assets.get("toolbar-btn-farm-"+i));
-            int finalI = i;
-            imageView.setOnMouseClicked(event -> {
-                String s = "toolbar-btn-farm-" + finalI;
-                System.out.println(s);
-            });
-            farmHBox.getChildren().add(imageView);
+    private GameObject createMilitaryBuilding(int id) {
+        switch (id)
+        {
+            case 1:
+                return new FlethersWorkshop(GV.mapPos.clone());
+            case 2:
+                return new PoleturnersWorkshop(GV.mapPos.clone());
+            case 3:
+                return new BlacksmithsWorkshop(GV.mapPos.clone());
+            case 4:
+                return new TannerWorkshop(GV.mapPos.clone());
+            case 5:
+                return new ArmourersWorkshop(GV.mapPos.clone());
+            default:
+                return null;
         }
-        farmHBox.setPadding(new Insets(30, 0, 0 , 20));
-        farmHBox.setSpacing(30);
-        farm.getChildren().add(farmHBox);
+    }
 
-
-        //home building
-        HBox homeHBox = new HBox();
-        for (int i = 1; i <6; i++) {
-            ImageView imageView = new ImageView(AssetManager.assets.get("toolbar-btn-home-"+i));
-            int finalI = i;
-            imageView.setOnMouseClicked(event -> {
-                String s = "toolbar-btn-home-" + finalI;
-                System.out.println(s);
-            });
-            homeHBox.getChildren().add(imageView);
+    private GameObject createHomeBuilding(int id) {
+        switch (id)
+        {
+            case 1:
+                Hovel.rand = (int)(Math.random()*4);
+                return new Hovel(GV.mapPos.clone());
+            case 2:
+                return new Chapel(GV.mapPos.clone());
+            case 3:
+                return new Church(GV.mapPos.clone());
+            case 4:
+                return new Cathedral(GV.mapPos.clone());
+            case 5:
+                return new Apothecary(GV.mapPos.clone());
+            default:
+                return null;
         }
-        homeHBox.setPadding(new Insets(30, 0, 0 , 20));
-        homeHBox.setSpacing(30);
-        home.getChildren().add(homeHBox);
+    }
 
-
-
-        //military building
-        HBox militaryHBox = new HBox();
-        for (int i = 1; i <6; i++) {
-            ImageView imageView = new ImageView(AssetManager.assets.get("toolbar-btn-military-"+i));
-            int finalI = i;
-            imageView.setOnMouseClicked(event -> {
-                String s = "toolbar-btn-military-" + finalI;
-                System.out.println(s);
-            });
-            militaryHBox.getChildren().add(imageView);
+    private GameObject createFarmBuilding(int id) {
+        switch (id)
+        {
+            case 1:
+                return new Hunter(GV.mapPos.clone());
+            case 2:
+                return new DiaryFarm(GV.mapPos.clone());
+            case 3:
+                return new AppleFarm(GV.mapPos.clone());
+            case 4:
+                return new WheatFarm(GV.mapPos.clone());
+            case 5:
+                return new HopsFarm(GV.mapPos.clone());
+            default:
+                return null;
         }
-        militaryHBox.setPadding(new Insets(30, 0, 0 , 20));
-        militaryHBox.setSpacing(30);
-        military.getChildren().add(militaryHBox);
+    }
 
-
-        //military building
-        HBox foodHBox = new HBox();
-        for (int i = 1; i <6; i++) {
-            ImageView imageView = new ImageView(AssetManager.assets.get("toolbar-btn-food-"+i));
-            int finalI = i;
-            imageView.setOnMouseClicked(event -> {
-                String s = "toolbar-btn-food-" + finalI;
-                System.out.println(s);
-            });
-            foodHBox.getChildren().add(imageView);
+    private GameObject createIndustryBuilding(int id) {
+        switch (id)
+        {
+            case 1:
+                return new StockPile(GV.mapPos.clone());
+            case 2:
+                return new WoodCutter(GV.mapPos.clone());
+            case 3:
+                return new StoneQuarry(GV.mapPos.clone());
+            case 5:
+                return new IronMine(GV.mapPos.clone());
+            case 6:
+                return new PitchRig(GV.mapPos.clone());
+            case 7:
+                return new MarketPlace(GV.mapPos.clone());
+            default:
+                return null;
         }
-        foodHBox.setPadding(new Insets(30, 0, 0 , 20));
-        foodHBox.setSpacing(30);
-        food.getChildren().add(foodHBox);
+    }
+
+    private GameObject createDefenseBuilding(int id) {
+        switch (id)
+        {
+            case 5:
+                return Barracks.createBrracks(GV.mapPos.clone());
+            case 6:
+                return MercenaryPost.createMercenaryPost(GV.mapPos.clone());
+            case 7:
+                return new Armory(GV.mapPos.clone());
+            default:
+                return null;
+        }
+    }
+
+    private GameObject createFoodBuilding(int id) {
+        switch (id)
+        {
+            case 1:
+                return new Granary(GV.mapPos.clone());
+            case 2:
+                return new Bakery(GV.mapPos.clone());
+            case 3:
+                return new Brewery(GV.mapPos.clone());
+            case 4:
+                return new Mill(GV.mapPos.clone());
+            case 5:
+                return new Inn(GV.mapPos.clone());
+            default:
+                return null;
+        }
+    }
+
+    public Pane getMainContent() {
+        return mainContent;
+    }
 
 
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public void setCurrentIndex(int currentIndex) {
+        this.currentIndex = currentIndex;
+    }
+
+    public String getCurrentKey() {
+        return currentKey;
+    }
+
+    public void setCurrentKey(String currentKey) {
+        this.currentKey = currentKey;
     }
 
     public double getWidth() {
         return width;
     }
-
     public void setWidth(double width) {
         this.width = width;
     }
-
     public double getHeight() {
         return height;
     }
-
     public void setHeight(double height) {
         this.height = height;
+    }
+
+    public GameObject getCurrentGameObject() {
+        return currentGameObject;
+    }
+
+    public void setCurrentGameObject(GameObject currentGameObject) {
+        this.currentGameObject = currentGameObject;
+    }
+
+    public boolean isWaitingToBePlaced() {
+        return waitingToBePlaced;
+    }
+
+    public void setWaitingToBePlaced(boolean waitingToBePlaced) {
+        this.waitingToBePlaced = waitingToBePlaced;
+    }
+
+    public Label getLblGold() {
+        return lblGold;
+    }
+
+    public void setLblGold(Label lblGold) {
+        this.lblGold = lblGold;
+    }
+
+    public Label getLblPopularity() {
+        return lblPopularity;
+    }
+
+    public void setLblPopularity(Label lblPopularity) {
+        this.lblPopularity = lblPopularity;
+    }
+
+    public Label getLblPopulation() {
+        return lblPopulation;
+    }
+
+    public void setLblPopulation(Label lblPopulation) {
+        this.lblPopulation = lblPopulation;
     }
 }
