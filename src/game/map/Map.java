@@ -1,12 +1,15 @@
 package game.map;
 
+import game.AssetManager;
 import game.GV;
+import game.gameobjects.Building;
 import game.gameobjects.GameObject;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.Food.Granary;
 import game.gameobjects.buildings.defense.Armory;
 import game.gameobjects.buildings.industry.StockPile;
 import game.gameobjects.buildings.townBuilding.Hovel;
+import game.gameobjects.units.Human;
 import game.map.components.DragComponent;
 import game.ui.inGame.Toolbar;
 import javafx.application.Application;
@@ -20,9 +23,11 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
+import javafx.scene.shape.Line;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Optional;
 
 public class Map extends Application
@@ -31,13 +36,14 @@ public class Map extends Application
     private int width;
     private int height;
     private int[][] tilesNumber;
+    public transient static java.util.Map<Tile , LinkedHashSet<Tile>> adjList = new LinkedHashMap<>();
     private transient Toolbar toolbar;
     private transient DragComponent dragComponent;
-    private transient Tile[][] tiles;
+    public static transient Tile[][] tiles;
     private transient java.util.Map<Integer,GameObject> gameObjects;
     private transient ScrollPane scrollPane;
     private transient BorderPane borderPane;
-    private transient Pane pane;
+    public static transient Pane pane;
     private transient Thread applyRules = new Thread(() -> {
         while (true)
         {
@@ -45,6 +51,14 @@ public class Map extends Application
             Platform.runLater(() -> {
                 toolbar.update();
             });
+
+            for(int id : gameObjects.keySet())
+            {
+                if(gameObjects.get(id) instanceof Building)
+                {
+                    ((Building)gameObjects.get(id)).produce();
+                }
+            }
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -58,6 +72,7 @@ public class Map extends Application
             GV.mousePosition.set(event.getX() , event.getY());
             if(event.getTarget() instanceof Tile)
             {
+
                 int j = (int)((Tile) event.getTarget()).getCoordinate().getX();
                 int i = (int)((Tile) event.getTarget()).getCoordinate().getY();
                 double x = Math.abs(tiles[i][j].getX() - GV.tileSize.getX());
@@ -101,7 +116,6 @@ public class Map extends Application
                     toolbar.getCurrentGameObject().setLayoutX(tiles[i][j].getX());
                     toolbar.getCurrentGameObject().setLayoutY(tiles[i][j].getY());
                     toolbar.setCurrentGameObject(null);
-
                 }
             }
         });
@@ -160,8 +174,6 @@ public class Map extends Application
         }
     }
 
-
-
     public void initialize()
     {
         gameObjects = new LinkedHashMap<>();
@@ -180,11 +192,53 @@ public class Map extends Application
                 double x = j * GV.tileSize.getX() + (i % 2 == 0 ?  0:GV.tileSize.getX()/2);
                 double y = (i)*GV.tileSize.getY()/2;
                 tiles[i][j] = new Tile(TileType.valueOf(0).get(),new Vector2D(j,i) , x , y );
+                tiles[i][j].setG(Double.MAX_VALUE);
+                tiles[i][j].setF(Double.MAX_VALUE);
                 pane.getChildren().add(tiles[i][j]);
             }
-
         }
-        System.out.println("hello");
+        for (int i = 0; i < tiles.length ;i++) {
+            for (int j = 0; j < tiles[i].length; j++) {
+                Tile tile = tiles[i][j];
+                adjList.put(tile , new LinkedHashSet<>());
+
+                try {
+                    adjList.get(tile).add(tiles[i][j+1]);
+                }catch (Exception e){}
+                try {
+                    adjList.get(tile).add(tiles[i][j-1]);
+                }catch (Exception e){}
+                try {
+                    adjList.get(tile).add(tiles[i+1][j]);
+                }catch (Exception e){}
+                try {
+                    adjList.get(tile).add(tiles[i-1][j]);
+                }catch (Exception e){}
+                try {
+                    adjList.get(tile).add(tiles[i+2][j]);
+                }catch (Exception e){}
+                try {
+                    adjList.get(tile).add(tiles[i-2][j]);
+                }catch (Exception e){}
+                if(i %2 ==0){
+                    try {
+                        adjList.get(tile).add(tiles[i-1][j-1]);
+                    }catch (Exception e){}
+                    try {
+                        adjList.get(tile).add(tiles[i+1][j-1]);
+                    }catch (Exception e){}
+                }else
+                {
+                    try {
+                        adjList.get(tile).add(tiles[i-1][j+1]);
+                    }catch (Exception e){}
+                    try {
+                        adjList.get(tile).add(tiles[i+1][j+1]);
+                    }catch (Exception e){}
+                }
+            }
+        }
+
         GameObject castle = Castle.createCastle(new Vector2D(500 , 500));
         if(Optional.ofNullable(castle).isPresent())
         {
@@ -200,10 +254,17 @@ public class Map extends Application
             });
             pane.getChildren().add(castle);
             pane.getChildren().add(stockPile);
-
         }
         else
             System.out.println("gameobject is null");
+//        GameObject citizen = new Human();
+//
+//        pane.getChildren().addAll(citizen);
+//        new Thread(() -> {
+//            tiles[9][10].setImage(AssetManager.images.get("sea"));
+//            citizen.move( tiles[0][0]   , tiles[9][10]);
+//
+//        }).start();
         applyRules.start();
         handleEvents();
     }

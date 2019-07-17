@@ -175,15 +175,15 @@ public class Toolbar extends Group {
         switch (id)
         {
             case 1:
-                return new FlethersWorkshop(GV.mapPos.clone());
+                return FlethersWorkshop.create(GV.mapPos.clone());
             case 2:
-                return new PoleturnersWorkshop(GV.mapPos.clone());
+                return PoleturnersWorkshop.create(GV.mapPos.clone());
             case 3:
-                return new BlacksmithsWorkshop(GV.mapPos.clone());
+                return BlacksmithsWorkshop.create(GV.mapPos.clone());
             case 4:
                 return new TannerWorkshop(GV.mapPos.clone());
             case 5:
-                return new ArmourersWorkshop(GV.mapPos.clone());
+                return ArmourersWorkshop.create(GV.mapPos.clone());
             default:
                 return null;
         }
@@ -212,15 +212,15 @@ public class Toolbar extends Group {
         switch (id)
         {
             case 1:
-                return new Hunter(GV.mapPos.clone());
+                return Hunter.create(GV.mapPos.clone());
             case 2:
-                return new DairyFarm(GV.mapPos.clone());
+                return DairyFarm.create(GV.mapPos.clone());
             case 3:
-                return new AppleFarm(GV.mapPos.clone());
+                return AppleFarm.create(GV.mapPos.clone());
             case 4:
-                return new WheatFarm(GV.mapPos.clone());
+                return WheatFarm.create(GV.mapPos.clone());
             case 5:
-                return new HopsFarm(GV.mapPos.clone());
+                return HopsFarm.create(GV.mapPos.clone());
             default:
                 return null;
         }
@@ -232,11 +232,11 @@ public class Toolbar extends Group {
             case 1:
                 return new StockPile(GV.mapPos.clone());
             case 2:
-                return new WoodCutter(GV.mapPos.clone());
+                return WoodCutter.create(GV.mapPos.clone());
             case 3:
-                return new StoneQuarry(GV.mapPos.clone());
+                return StoneQuarry.create(GV.mapPos.clone());
             case 5:
-                return new IronMine(GV.mapPos.clone());
+                return IronMine.create(GV.mapPos.clone());
             case 6:
                 return new PitchRig(GV.mapPos.clone());
             case 7:
@@ -266,13 +266,13 @@ public class Toolbar extends Group {
             case 1:
                 return new Granary(GV.mapPos.clone());
             case 2:
-                return new Bakery(GV.mapPos.clone());
+                return Bakery.create(GV.mapPos.clone());
             case 3:
-                return new Brewery(GV.mapPos.clone());
+                return Brewery.create(GV.mapPos.clone());
             case 4:
-                return new Mill(GV.mapPos.clone());
+                return Mill.create(GV.mapPos.clone());
             case 5:
-                return new Inn(GV.mapPos.clone());
+                return Inn.create(GV.mapPos.clone());
             default:
                 return null;
         }
@@ -355,7 +355,6 @@ public class Toolbar extends Group {
     public void update() {
         getLblGold().setText(Castle.getGold().get() + "");
         getLblPopularity().setText(Castle.getPopularity().get() + "");
-        System.out.println(Castle.getMaxPopulationSize().get());
         getLblPopulation().setText(Castle.getCurrentPopulation().get() +"/"+Castle.getMaxPopulationSize().get());
     }
 }

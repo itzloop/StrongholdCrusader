@@ -9,6 +9,7 @@ import game.gameobjects.buildings.industry.MarketPlace;
 import game.gameobjects.buildings.industry.StockPile;
 import game.map.Map;
 import game.map.Vector2D;
+import javafx.application.Platform;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.HBox;
@@ -20,7 +21,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Castle  extends Building{
     private static final AtomicInteger count = new AtomicInteger(0);
     private static final AtomicInteger maxStockPileCapacity = new AtomicInteger(0);
-    private static final AtomicInteger currentStockPileCapacity = new AtomicInteger(0);
+    private static final AtomicInteger currentStockPileCapacity = new AtomicInteger(industryResources.wood.get());
     private static final AtomicInteger maxArmoryCapacity = new AtomicInteger(0);
     private static final AtomicInteger currentArmoryCapacity = new AtomicInteger(0);
     private static final AtomicInteger maxGranaryCapacity = new AtomicInteger(0);
@@ -102,14 +103,15 @@ public class Castle  extends Building{
         Granary.update();
         Armory.update();
 
-        lblStockpile.setText("Stock Pile Capacity: "+ currentStockPileCapacity.get() +"/" +  maxStockPileCapacity.get() );
-        lblGranary.setText("Granary Capacity: "+ currentGranaryCapacity + "/" + maxGranaryCapacity.get());
-        lblArmory.setText("Armory Capacity: "+ currentArmoryCapacity.get() + "/" + maxArmoryCapacity.get());
+        Platform.runLater(() -> {
+            lblStockpile.setText("Stock Pile Capacity: "+ currentStockPileCapacity.get() +"/" +  maxStockPileCapacity.get() );
+            lblGranary.setText("Granary Capacity: "+ currentGranaryCapacity.get() + "/" + maxGranaryCapacity.get());
+            lblArmory.setText("Armory Capacity: "+ currentArmoryCapacity.get() + "/" + maxArmoryCapacity.get());
+        });
     }
 
 
     //************************* BUY ************************
-
     public static boolean buy(ResourceType type ,ResourceName name , int price,int amount){
         //see if we have the money
         if(gold.get() - price*amount < 0)
@@ -166,8 +168,8 @@ public class Castle  extends Building{
             case WHEAT:
                 Food.wheat.getAndAdd(amount);
                 break;
-            case FLOWER:
-                Food.flower.getAndAdd(amount);
+            case FLOUR:
+                Food.flour.getAndAdd(amount);
                 break;
             case BREAD:
                 Food.bread.getAndAdd(amount);
@@ -299,9 +301,9 @@ public class Castle  extends Building{
                     Food.wheat.getAndAdd(-amount);
                 else return false;
                 break;
-            case FLOWER:
-                if(Food.flower.get() - amount >= 0 )
-                    Food.flower.getAndAdd(-amount);
+            case FLOUR:
+                if(Food.flour.get() - amount >= 0 )
+                    Food.flour.getAndAdd(-amount);
                 else return false;
                 break;
             case BREAD:
@@ -386,8 +388,8 @@ public class Castle  extends Building{
                 return Food.apple.get();
             case CHEESE:
                 return Food.cheese.get();
-            case FLOWER:
-                return Food.flower.get();
+            case FLOUR:
+                return Food.flour.get();
             case HOP:
                 return Food.hop.get();
             case MEAT:
@@ -414,6 +416,62 @@ public class Castle  extends Building{
                 return Weaponry.metalArmor.get();
             default:
                 return -1;
+        }
+    }
+
+
+    public static void setResouce(ResourceName name , int amount)
+    {
+        switch (name)
+        {
+            case BREAD:
+                Food.bread.getAndAdd(amount);
+                break;
+            case APPLE:
+                Food.apple.getAndAdd(amount);
+                break;
+            case CHEESE:
+                Food.cheese.getAndAdd(amount);
+                break;
+            case FLOUR:
+                Food.flour.getAndAdd(amount);
+                break;
+            case HOP:
+                Food.hop.getAndAdd(amount);
+                break;
+            case MEAT:
+                Food.meat.getAndAdd(amount);
+                break;
+            case WHEAT:
+                Food.wheat.getAndAdd(amount);
+                break;
+            case BREW:
+                Food.brew.getAndAdd(amount);
+                break;
+            case WOOD:
+                industryResources.wood.getAndAdd(amount);
+                break;
+            case STONE:
+                industryResources.stone.getAndAdd(amount);
+                break;
+            case IRON:
+                industryResources.iron.getAndAdd(amount);
+                break;
+            case AXE:
+                Weaponry.axe.getAndAdd(amount);
+                break;
+            case BOW:
+                Weaponry.bow.getAndAdd(amount);
+                break;
+            case SWORD:
+                Weaponry.sword.getAndAdd(amount);
+                break;
+            case LEATHER_ARMOR:
+                Weaponry.leatherArmor.getAndAdd(amount);
+                break;
+            case METAL_ARMOR:
+                Weaponry.metalArmor.getAndAdd(amount);
+                break;
         }
     }
 

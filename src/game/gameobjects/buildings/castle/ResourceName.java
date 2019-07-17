@@ -11,7 +11,7 @@ public enum  ResourceName {
     WHEAT,
     BREAD,
     BREW,
-    FLOWER,
+    FLOUR,
     BOW,
     AXE,
     SWORD,

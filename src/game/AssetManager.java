@@ -20,6 +20,7 @@ public class AssetManager {
 
             images.put("building-castle" , new Image(new FileInputStream("Resources/Tiles2/tile_buildings2.gm1/castle.png")));
             images.put("dust" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection140.png")));
+            images.put("sea" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection43.png")));
             images.put("tile4" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection140-4x4.png")));
             images.put("grass" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection186.png")));
             images.put("toolbar" , new Image(new FileInputStream("Resources/Misc/face800-blank.gm1/0_0img0.png")));
@@ -147,7 +148,7 @@ public class AssetManager {
             images.put("meat" ,             new Image(new FileInputStream("Resources/Misc/interface_icons2.gm1/0_0img65.png")));
             images.put("apple" ,            new Image(new FileInputStream("Resources/Misc/interface_icons2.gm1/0_0img67.png")));
             images.put("brew" ,           new Image(new FileInputStream("Resources/Misc/interface_icons2.gm1/0_0img69.png")));
-            images.put("flower" ,           new Image(new FileInputStream("Resources/Misc/interface_icons2.gm1/0_0img73.png")));
+            images.put("flour" ,           new Image(new FileInputStream("Resources/Misc/interface_icons2.gm1/0_0img73.png")));
             images.put("gold" ,             new Image(new FileInputStream("Resources/Misc/interface_icons2.gm1/0_0img71.png")));
             images.put("bow" ,              new Image(new FileInputStream("Resources/Misc/interface_icons2.gm1/0_0img75.png")));
             images.put("axe" ,              new Image(new FileInputStream("Resources/Misc/interface_icons2.gm1/0_0img81.png")));

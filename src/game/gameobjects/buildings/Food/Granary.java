@@ -39,7 +39,7 @@ public class Granary extends Building {
         img4 = new ImageView(AssetManager.images.get("hop"));
         img5 = new ImageView(AssetManager.images.get("brew"));
         img6 = new ImageView(AssetManager.images.get("wheat"));
-        img7 = new ImageView(AssetManager.images.get("flower"));
+        img7 = new ImageView(AssetManager.images.get("flour"));
         img8 = new ImageView(AssetManager.images.get("bread"));
 
         toolbar.getChildren().addAll(img1 , img2 , img3 , img4 , img5 , img6 , img7 , img8 );
@@ -57,7 +57,7 @@ public class Granary extends Building {
         Tooltip.install(img4 , new Tooltip("amount: " + Castle.resourceAmount(ResourceName.HOP)));
         Tooltip.install(img5 , new Tooltip("amount: " + Castle.resourceAmount(ResourceName.BREW)));
         Tooltip.install(img6 , new Tooltip("amount: " + Castle.resourceAmount(ResourceName.WHEAT)));
-        Tooltip.install(img7 , new Tooltip("amount: " + Castle.resourceAmount(ResourceName.FLOWER)));
+        Tooltip.install(img7 , new Tooltip("amount: " + Castle.resourceAmount(ResourceName.FLOUR)));
         Tooltip.install(img8 , new Tooltip("amount: " + Castle.resourceAmount(ResourceName.BREAD)));
     }
 }

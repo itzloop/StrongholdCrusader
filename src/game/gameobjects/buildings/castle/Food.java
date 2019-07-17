@@ -10,5 +10,5 @@ public class Food  {
     static final AtomicInteger wheat    = new AtomicInteger(0);
     static final AtomicInteger bread    = new AtomicInteger(0);
     static final AtomicInteger brew     = new AtomicInteger(0);
-    static final AtomicInteger flower   = new AtomicInteger(0);
+    static final AtomicInteger flour   = new AtomicInteger(0);
 }

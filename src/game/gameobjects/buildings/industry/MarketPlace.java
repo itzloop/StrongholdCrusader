@@ -40,7 +40,7 @@ public class MarketPlace extends Building {
         prices.put("hop" , 10);
         prices.put("brew" , 50);
         prices.put("wheat" , 20);
-        prices.put("flower" , 60);
+        prices.put("flour" , 60);
         prices.put("wood" ,10);
         prices.put("stone" , 20);
         prices.put("iron" , 70);
@@ -78,7 +78,7 @@ public class MarketPlace extends Building {
                     "hop",
                     "brew",
                     "wheat",
-                    "flower",
+                    "flour",
                     "bread"
             };
             toolbar.getChildren().clear();

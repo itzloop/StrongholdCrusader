@@ -6,16 +6,14 @@ import game.gameobjects.GameObject;
 import game.gameobjects.GameObjectHelper;
 import javafx.scene.image.ImageView;
 
-public class Tile extends ImageView
+public class Tile extends ImageView implements Comparable<Tile>
 {
-
-
-
-
     private TileType tileType;
     private Vector2D coordinate;
     private Vector2D pos;
     private GameObjectHelper placedGameobject;
+    private double g;
+    private double f;
     public Tile(TileType tileType ,Vector2D location , double x , double y) {
         super();
         switch (tileType)
@@ -43,6 +41,21 @@ public class Tile extends ImageView
         super.setFitHeight(GV.tileSize.getY());
     }
 
+    public double getG() {
+        return g;
+    }
+
+    public void setG(double g) {
+        this.g = g;
+    }
+
+    public double getF() {
+        return f;
+    }
+
+    public void setF(double f) {
+        this.f = f;
+    }
 
     public GameObjectHelper getPlacedGameobject() {
         return placedGameobject;
@@ -80,6 +93,13 @@ public class Tile extends ImageView
 
     @Override
     public String toString() {
-        return "[source = pane , " + "tile type = " + tileType + " , coordinate = " + coordinate + " , pos = " + pos;
+        return "[source = tile , " + "tile type = " + tileType + " , coordinate = " + coordinate + " , pos = " + pos;
     }
+
+
+    @Override
+    public int compareTo(Tile that) {
+        return Double.compare(this.f, that.f);
+    }
+
 }

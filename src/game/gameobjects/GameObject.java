@@ -1,6 +1,7 @@
 package game.gameobjects;
 
 import game.AssetManager;
+import game.map.Tile;
 import game.map.Vector2D;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -12,17 +13,26 @@ public class GameObject extends ImageView {
     private int id;
     private int playerId;
     private double health;
+    private Tile on;
     private GameObjectHelper gameObjectHelper;
     private Vector2D location;
     private HBox toolbar;
-    public GameObject(String imageKey , Vector2D location ){
+    public GameObject(String imageKey ){
         super(AssetManager.images.get(imageKey));
         super.setLayoutX(location.getX());
         super.setLayoutY(location.getY());
         this.id = idGenerator.getAndIncrement();
-        this.location = location;
         this.health = 100;
         gameObjectHelper =new GameObjectHelper(imageKey , id , playerId , location);
+    }
+
+
+    public Tile getOn() {
+        return on;
+    }
+
+    public void setOn(Tile on) {
+        this.on = on;
     }
 
     public void setToolbar(HBox toolbar) {
