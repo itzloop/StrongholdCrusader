@@ -21,15 +21,15 @@ public class Tile extends ImageView
         switch (tileType)
         {
             case DUST:
-                super.setImage(AssetManager.assets.get("dust"));
+                super.setImage(AssetManager.images.get("dust"));
                 break;
             case MOUNTAIN:
 
-                super.setImage(AssetManager.assets.get("dust"));
+                super.setImage(AssetManager.images.get("dust"));
                 break;
             case SEA:
 
-                super.setImage(AssetManager.assets.get("dust"));
+                super.setImage(AssetManager.images.get("dust"));
                 break;
         }
 

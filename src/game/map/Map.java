@@ -2,10 +2,11 @@ package game.map;
 
 import game.GV;
 import game.gameobjects.GameObject;
-import game.gameobjects.buildings.Castle;
+import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.Food.Granary;
 import game.gameobjects.buildings.defense.Armory;
 import game.gameobjects.buildings.industry.StockPile;
+import game.gameobjects.buildings.townBuilding.Hovel;
 import game.map.components.DragComponent;
 import game.ui.inGame.Toolbar;
 import javafx.application.Application;
@@ -17,6 +18,8 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import java.util.LinkedHashMap;
@@ -40,9 +43,7 @@ public class Map extends Application
         {
             Castle.caculate();
             Platform.runLater(() -> {
-                toolbar.getLblGold().setText(Castle.getGold().get() + "");
-                toolbar.getLblPopularity().setText(Castle.getPopularity().get() + "");
-                toolbar.getLblPopulation().setText(Castle.getCurrentPopulation() +"/"+Castle.getMaxPopulationSize());
+                toolbar.update();
             });
             try {
                 Thread.sleep(1000);
@@ -75,6 +76,8 @@ public class Map extends Application
                         Castle.getMaxGranaryCapacity().addAndGet(-GV.GranaryCapacity);
                     if(toolbar.getCurrentGameObject() instanceof Armory)
                         Castle.getMaxArmoryCapacity().addAndGet(-GV.armoryCapacity);
+                    if(toolbar.getCurrentGameObject() instanceof Hovel)
+                        Castle.getMaxPopulationSize().addAndGet(-GV.HovelCapacity);
                     toolbar.setWaitingToBePlaced(false);
                     pane.getChildren().remove(toolbar.getCurrentGameObject());
                     toolbar.setCurrentGameObject(null);
@@ -259,6 +262,12 @@ public class Map extends Application
     public static void main(String[] args) {
        launch(args);
     }
+
+    public static void playSound(Media media)
+    {
+        new MediaPlayer(media).play();
+    }
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {

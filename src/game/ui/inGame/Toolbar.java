@@ -3,7 +3,7 @@ package game.ui.inGame;
 import game.AssetManager;
 import game.GV;
 import game.gameobjects.GameObject;
-import game.gameobjects.buildings.Castle;
+import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.Food.*;
 import game.gameobjects.buildings.defense.Armory;
 import game.gameobjects.buildings.defense.Barracks;
@@ -17,10 +17,10 @@ import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -50,8 +50,6 @@ public class Toolbar extends Group {
 
     public Toolbar(Pane pane , Map<Integer , GameObject> gameObjects)
     {
-
-
         mainContent = new Pane();
         this.pane = pane;
         this.gameObjects = gameObjects;
@@ -71,11 +69,11 @@ public class Toolbar extends Group {
         texts.setAlignment(Pos.CENTER);
 
         //load the images
-        ImageView backgroundImage = new ImageView(AssetManager.assets.get("toolbar"));
-        ImageView backgroundFill= new ImageView(AssetManager.assets.get("toolbar-fill"));
+        ImageView backgroundImage = new ImageView(AssetManager.images.get("toolbar"));
+        ImageView backgroundFill= new ImageView(AssetManager.images.get("toolbar-fill"));
         ImageView[] buttons = new ImageView[keys.length];
         for (int i = 0; i < buttons.length; i++) {
-            buttons[i] = new ImageView(AssetManager.assets.get("toolbar-btn-"+keys[i]));
+            buttons[i] = new ImageView(AssetManager.images.get("toolbar-btn-"+keys[i]));
         }
 
         //layout setup
@@ -119,7 +117,7 @@ public class Toolbar extends Group {
     {
         HBox hBox = new HBox();
         for (int i = 1; i <count; i++) {
-            ImageView imageView = new ImageView(AssetManager.assets.get("toolbar-btn-"+key + "-" + i));
+            ImageView imageView = new ImageView(AssetManager.images.get("toolbar-btn-"+key + "-" + i));
             imageView.setFitWidth(50);
             imageView.setFitHeight(50);
             int finalI = i;
@@ -129,6 +127,10 @@ public class Toolbar extends Group {
                     GameObject gameObject = createObject(key , finalI);
                     if(!Optional.ofNullable(gameObject).isPresent())
                         throw new Exception("game object is null with id: " + key+"-"+finalI);
+                    gameObject.addEventHandler(MouseEvent.MOUSE_CLICKED , event1 -> {
+                        mainContent.getChildren().clear();
+                        mainContent.getChildren().add(gameObject.getToolbar());
+                    });
                     currentIndex = finalI;
                     currentKey = key;
                     gameObjects.put(gameObject.getObjectId() , gameObject);
@@ -212,7 +214,7 @@ public class Toolbar extends Group {
             case 1:
                 return new Hunter(GV.mapPos.clone());
             case 2:
-                return new DiaryFarm(GV.mapPos.clone());
+                return new DairyFarm(GV.mapPos.clone());
             case 3:
                 return new AppleFarm(GV.mapPos.clone());
             case 4:
@@ -238,7 +240,7 @@ public class Toolbar extends Group {
             case 6:
                 return new PitchRig(GV.mapPos.clone());
             case 7:
-                return new MarketPlace(GV.mapPos.clone());
+                return MarketPlace.createMarketPlace(GV.mapPos.clone());
             default:
                 return null;
         }
@@ -348,5 +350,12 @@ public class Toolbar extends Group {
 
     public void setLblPopulation(Label lblPopulation) {
         this.lblPopulation = lblPopulation;
+    }
+
+    public void update() {
+        getLblGold().setText(Castle.getGold().get() + "");
+        getLblPopularity().setText(Castle.getPopularity().get() + "");
+        System.out.println(Castle.getMaxPopulationSize().get());
+        getLblPopulation().setText(Castle.getCurrentPopulation().get() +"/"+Castle.getMaxPopulationSize().get());
     }
 }

@@ -10,7 +10,6 @@ public class Building extends GameObject {
 
     private boolean placed;
 
-    private HBox toolbar;
     public Building(String imageKey , Vector2D location )
     {
         super(imageKey , location );

@@ -3,19 +3,12 @@ package game.map;
 import game.AssetManager;
 import game.GV;
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.geometry.Point2D;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
-
-import java.awt.event.MouseEvent;
 
 public class Shape extends Application {
     @Override
@@ -64,7 +57,7 @@ public class Shape extends Application {
             center.getX() , center.getY() + GV.tileSize.getY()/2,
             center.getX()-GV.tileSize.getX()/2 , center.getY()
         });
-        diamond.setFill(new ImagePattern(AssetManager.assets.get("dust")));
+        diamond.setFill(new ImagePattern(AssetManager.images.get("dust")));
         return diamond;
     }
 

@@ -16,7 +16,7 @@ public class GameObject extends ImageView {
     private Vector2D location;
     private HBox toolbar;
     public GameObject(String imageKey , Vector2D location ){
-        super(AssetManager.assets.get(imageKey));
+        super(AssetManager.images.get(imageKey));
         super.setLayoutX(location.getX());
         super.setLayoutY(location.getY());
         this.id = idGenerator.getAndIncrement();

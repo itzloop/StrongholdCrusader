@@ -7,9 +7,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class GV {
-//
-//    public static final double       screenWidth         = Screen.getPrimary().getBounds().getWidth();
-//    public static final double       screenHeight        = Screen.getPrimary().getBounds().getHeight();
     public static       boolean      placed              =false;
     public static final int          port                = 15152;
     public static final int          initialSPCapacity   = 500;
@@ -19,11 +16,12 @@ public class GV {
     public static final int          initialPopularity   = 100;
     public static final int          stockPileCapacity   = 1000;
     public static final int          GranaryCapacity     = 1000;
+    public static final int          HovelCapacity       = 5;
     public static final int          armoryCapacity      = 1000;
     public static final int          serverHolderPort    = 15151;
     public static final int          packetSize          = 65535;
     public static final int          maxPlayers          = 10000;
-    public static final Vector2D     tileSize = new Vector2D(AssetManager.assets.get("dust").getWidth(),AssetManager.assets.get("dust").getHeight());
+    public static final Vector2D     tileSize = new Vector2D(AssetManager.images.get("dust").getWidth(),AssetManager.images.get("dust").getHeight());
     public static       Vector2D     mousePosition = new Vector2D();
     public static       Vector2D     mapPos = new Vector2D();
     public static final int          requestListSize     = 100;

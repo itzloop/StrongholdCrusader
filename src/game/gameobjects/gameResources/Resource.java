@@ -1,4 +1,6 @@
 package game.gameobjects.gameResources;
 
-public class Resource {
+
+public enum  Resource {
+    WOOD,STONE,IRON,APPLE,WHEAT,MEAT,HOP,BREW
 }
