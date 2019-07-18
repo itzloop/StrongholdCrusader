@@ -2,6 +2,8 @@ package game.gameobjects.buildings.townBuilding;
 
 import game.GV;
 import game.gameobjects.Building;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.map.Vector2D;
 import javafx.geometry.Pos;
@@ -12,9 +14,10 @@ public class Hovel extends Building {
 
     public static  int rand= (int)(Math.random()*4 );
 
-    public Hovel(Vector2D location)
+    public Hovel()
     {
-        super("building-home-1-" + rand, location);
+        super("building-home-1-" );
+        setGameObjectHelper(new GameObjectHelper( "building-home-5" , getObjectId() , GameobjectType.APOTHECARY ));
         System.out.println(rand);
         Castle.getMaxPopulationSize().getAndAdd(GV.HovelCapacity);
         HBox toolbar = new HBox();

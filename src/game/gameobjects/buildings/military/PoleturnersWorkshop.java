@@ -3,6 +3,8 @@ package game.gameobjects.buildings.military;
 import game.AssetManager;
 import game.gameobjects.Building;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.map.Map;
@@ -20,9 +22,10 @@ public class PoleturnersWorkshop extends Building {
 
 
 
-    private PoleturnersWorkshop(Vector2D location)
+    private PoleturnersWorkshop()
     {
-        super("building-military-2" , location);
+        super("building-military-2");
+        setGameObjectHelper(new GameObjectHelper( "building-military-2" , getObjectId() , GameobjectType.POLETURNERS_WORKSHOP ));
         HBox toolbar = new HBox();
         Label label = new Label("Poleturners Workshop");
         label.setStyle("-fx-font-size: 50");
@@ -56,11 +59,11 @@ public class PoleturnersWorkshop extends Building {
     }
 
 
-    public static GameObject create(Vector2D location)
+    public static GameObject create()
     {
         if(Castle.getGold().get() - price >= 0 ) {
             Castle.getGold().getAndAdd(-price);
-            return new PoleturnersWorkshop(location);
+            return new PoleturnersWorkshop();
         }
         else {
             Map.playSound(AssetManager.sounds.get("need-gold"));

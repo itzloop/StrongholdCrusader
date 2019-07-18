@@ -21,7 +21,7 @@ import java.util.function.Function;
 
 public class Player
 {
-    private int                                     id;
+    private static int                                     id;
     private int                                     population;
     private int                                     port;
     private String                                  name;
@@ -178,6 +178,8 @@ public class Player
     }
 
 
+
+
     public boolean hasMap() {
         return hasMap;
     }
@@ -205,7 +207,7 @@ public class Player
         this.name = name;
     }
 
-    public int getId() {
+    public static int getId() {
         return id;
     }
 

@@ -3,6 +3,8 @@ package game.gameobjects.buildings.defense;
 import game.AssetManager;
 import game.GV;
 import game.gameobjects.Building;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.gameobjects.buildings.castle.ResourceType;
@@ -25,8 +27,9 @@ public class Armory extends Building {
     private static ImageView img4;
     private static ImageView img5;
 
-    public Armory(Vector2D location ){
-        super("building-defense-7" , location );
+    public Armory(){
+        super("building-defense-7"  );
+        setGameObjectHelper(new GameObjectHelper( "building-defense-7"  , getObjectId() , GameobjectType.ARMORY ));
         HBox toolbar = new HBox();
         Castle.getMaxArmoryCapacity().getAndAdd(GV.armoryCapacity);
         String[] keys = {

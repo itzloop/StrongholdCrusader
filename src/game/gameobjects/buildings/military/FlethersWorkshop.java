@@ -3,6 +3,8 @@ package game.gameobjects.buildings.military;
 import game.AssetManager;
 import game.gameobjects.Building;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.map.Map;
@@ -20,9 +22,10 @@ public class FlethersWorkshop extends Building {
 
 
 
-    private FlethersWorkshop(Vector2D location)
+    private FlethersWorkshop()
     {
-        super("building-military-1" , location);
+        super("building-military-1");
+        setGameObjectHelper(new GameObjectHelper( "building-military-1" , getObjectId() , GameobjectType.FLETHERS_WORKSHOP ));
         HBox toolbar = new HBox();
         Label label = new Label("Flethers Workshop");
         label.setStyle("-fx-font-size: 50");
@@ -55,11 +58,11 @@ public class FlethersWorkshop extends Building {
     }
 
 
-    public static GameObject create(Vector2D location)
+    public static GameObject create()
     {
         if(Castle.getGold().get() - price >= 0 ) {
             Castle.getGold().getAndAdd(-price);
-            return new FlethersWorkshop(location);
+            return new FlethersWorkshop();
         }
         else {
             Map.playSound(AssetManager.sounds.get("need-gold"));

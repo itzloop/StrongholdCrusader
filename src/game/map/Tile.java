@@ -4,6 +4,7 @@ import game.AssetManager;
 import game.GV;
 import game.gameobjects.GameObject;
 import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import javafx.scene.image.ImageView;
 
 public class Tile extends ImageView implements Comparable<Tile>
@@ -11,23 +12,35 @@ public class Tile extends ImageView implements Comparable<Tile>
     private TileType tileType;
     private Vector2D coordinate;
     private Vector2D pos;
-    private GameObjectHelper placedGameobject;
+    private GameobjectType occupiedType;
     private double g;
     private double f;
+    private boolean obstacle;
     public Tile(TileType tileType ,Vector2D location , double x , double y) {
         super();
         switch (tileType)
         {
             case DUST:
-                super.setImage(AssetManager.images.get("dust"));
+                double rand =Math.random()*100000;
+                if(rand < 50000) super.setImage(AssetManager.images.get("dust"));
+                else if(rand <75500  && rand >=50000) super.setImage(AssetManager.images.get("dust2"));
+                else super.setImage(AssetManager.images.get("dust2"));
+                obstacle = false;
                 break;
             case MOUNTAIN:
-
-                super.setImage(AssetManager.images.get("dust"));
+                double rand2 =Math.random()*100000;
+                if(rand2 < 50000) super.setImage(AssetManager.images.get("mount1"));
+                else if(rand2 <75500  && rand2 >=50000) super.setImage(AssetManager.images.get("mount2"));
+                else super.setImage(AssetManager.images.get("mount3"));
+                obstacle = true;
                 break;
             case SEA:
-
-                super.setImage(AssetManager.images.get("dust"));
+                obstacle = true;
+                super.setImage(AssetManager.images.get("sea"));
+                break;
+            case GRASS:
+                obstacle = false;
+                super.setImage(AssetManager.images.get("grass"));
                 break;
         }
 
@@ -57,12 +70,12 @@ public class Tile extends ImageView implements Comparable<Tile>
         this.f = f;
     }
 
-    public GameObjectHelper getPlacedGameobject() {
-        return placedGameobject;
+    public GameobjectType getOccupiedType() {
+        return occupiedType;
     }
 
-    public void setPlacedGameobject(GameObjectHelper placedGameobject) {
-        this.placedGameobject = placedGameobject;
+    public void setOccupiedType(GameobjectType occupiedType) {
+            this.occupiedType = occupiedType;
     }
 
     public TileType getTileType() {
@@ -93,7 +106,7 @@ public class Tile extends ImageView implements Comparable<Tile>
 
     @Override
     public String toString() {
-        return "[source = tile , " + "tile type = " + tileType + " , coordinate = " + coordinate + " , pos = " + pos;
+        return "pos = " + pos;
     }
 
 
@@ -102,4 +115,7 @@ public class Tile extends ImageView implements Comparable<Tile>
         return Double.compare(this.f, that.f);
     }
 
+    public boolean isObstacle() {
+        return obstacle;
+    }
 }

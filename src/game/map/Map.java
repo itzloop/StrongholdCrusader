@@ -44,6 +44,7 @@ public class Map extends Application
     private transient ScrollPane scrollPane;
     private transient BorderPane borderPane;
     public static transient Pane pane;
+    private Human currentHuman;
     private transient Thread applyRules = new Thread(() -> {
         while (true)
         {
@@ -72,12 +73,12 @@ public class Map extends Application
             GV.mousePosition.set(event.getX() , event.getY());
             if(event.getTarget() instanceof Tile)
             {
-
                 int j = (int)((Tile) event.getTarget()).getCoordinate().getX();
                 int i = (int)((Tile) event.getTarget()).getCoordinate().getY();
                 double x = Math.abs(tiles[i][j].getX() - GV.tileSize.getX());
                 double y = tiles[i][j].getY() - GV.tileSize.getY();
                 GV.mapPos.set(x, y);
+//                System.out.println(i +","+j + " , " + tiles[i][j].getOccupiedType());
                 if(Optional.ofNullable(toolbar.getCurrentGameObject()).isPresent() && toolbar.isWaitingToBePlaced())
                 {
                     toolbar.getCurrentGameObject().setLayoutX(tiles[i][j].getX());
@@ -96,27 +97,28 @@ public class Map extends Application
                     toolbar.setWaitingToBePlaced(false);
                     pane.getChildren().remove(toolbar.getCurrentGameObject());
                     toolbar.setCurrentGameObject(null);
-                    toolbar.setCurrentIndex(-1);
-                    toolbar.setCurrentKey("");
+//                    toolbar.setCurrentIndex(-1);
+//                    toolbar.setCurrentKey("");
                 }else if(event.getButton() == MouseButton.PRIMARY && Optional.ofNullable(toolbar.getCurrentGameObject()).isPresent())
                 {
-                    if(i % 2 == 0)
-                    {
-                        tiles[i][j].setPlacedGameobject(toolbar.getCurrentGameObject().getGameObjectHelper());
-                        tiles[i][j+1].setPlacedGameobject(toolbar.getCurrentGameObject().getGameObjectHelper());
-                        tiles[i+1][j].setPlacedGameobject(toolbar.getCurrentGameObject().getGameObjectHelper());
-                        tiles[i-1][j].setPlacedGameobject(toolbar.getCurrentGameObject().getGameObjectHelper());
-                    }else
-                    {
-                        tiles[i][j].setPlacedGameobject(toolbar.getCurrentGameObject().getGameObjectHelper());
-                        tiles[i][j+1].setPlacedGameobject(toolbar.getCurrentGameObject().getGameObjectHelper());
-                        tiles[i-1][j+1].setPlacedGameobject(toolbar.getCurrentGameObject().getGameObjectHelper());
-                        tiles[i+1][j+1].setPlacedGameobject(toolbar.getCurrentGameObject().getGameObjectHelper());
-                    }
-                    toolbar.getCurrentGameObject().setLayoutX(tiles[i][j].getX());
-                    toolbar.getCurrentGameObject().setLayoutY(tiles[i][j].getY());
+
+                    toolbar.getCurrentGameObject().setIJ(i,j);
+                    System.out.println(toolbar.getCurrentGameObject().getX() + " , " + toolbar.getCurrentGameObject().getY());
                     toolbar.setCurrentGameObject(null);
                 }
+                if(event.getButton() == MouseButton.PRIMARY && Optional.ofNullable(currentHuman).isPresent())
+                {
+                    Human h = currentHuman;
+                    currentHuman = null;
+                    new Thread(() ->{
+                        h.move(tiles[i][j]);
+                        System.out.println("moved");
+                    }).start();
+                }
+            }
+            if(event.getTarget() instanceof Human && event.getButton() == MouseButton.PRIMARY)
+            {
+                currentHuman = (Human) event.getTarget();
             }
         });
         pane.addEventHandler(MouseEvent.MOUSE_MOVED , event -> {
@@ -186,17 +188,9 @@ public class Map extends Application
         StackPane stackPane = new StackPane(scrollPane , toolbar);
         stackPane.setAlignment(Pos.BOTTOM_LEFT);
         borderPane.setCenter(stackPane);
-        tiles = new Tile[width][height];
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                double x = j * GV.tileSize.getX() + (i % 2 == 0 ?  0:GV.tileSize.getX()/2);
-                double y = (i)*GV.tileSize.getY()/2;
-                tiles[i][j] = new Tile(TileType.valueOf(0).get(),new Vector2D(j,i) , x , y );
-                tiles[i][j].setG(Double.MAX_VALUE);
-                tiles[i][j].setF(Double.MAX_VALUE);
-                pane.getChildren().add(tiles[i][j]);
-            }
-        }
+        tiles = MapLoader.load();
+        toolbar.setMiniMap(MapLoader.loadMiniMap());
+
         for (int i = 0; i < tiles.length ;i++) {
             for (int j = 0; j < tiles[i].length; j++) {
                 Tile tile = tiles[i][j];
@@ -239,15 +233,17 @@ public class Map extends Application
             }
         }
 
-        GameObject castle = Castle.createCastle(new Vector2D(500 , 500));
+        GameObject castle = Castle.createCastle();
         if(Optional.ofNullable(castle).isPresent())
         {
+            castle.setIJ(GV.castlePos[0][0] , GV.castlePos[0][1]);
             gameObjects.put(castle.getObjectId() , castle);
             castle.addEventHandler(MouseEvent.MOUSE_CLICKED , event -> {
                 toolbar.getMainContent().getChildren().clear();
                 toolbar.getMainContent().getChildren().add(castle.getToolbar());
             });
-            GameObject stockPile = new StockPile(new Vector2D(600 , 600));
+            GameObject stockPile = new StockPile();
+            stockPile.setIJ(8,8);
             stockPile.addEventHandler(MouseEvent.MOUSE_CLICKED , event -> {
                 toolbar.getMainContent().getChildren().clear();
                 toolbar.getMainContent().getChildren().add(stockPile.getToolbar());
@@ -257,14 +253,9 @@ public class Map extends Application
         }
         else
             System.out.println("gameobject is null");
-//        GameObject citizen = new Human();
-//
-//        pane.getChildren().addAll(citizen);
-//        new Thread(() -> {
-//            tiles[9][10].setImage(AssetManager.images.get("sea"));
-//            citizen.move( tiles[0][0]   , tiles[9][10]);
-//
-//        }).start();
+        GameObject citizen = new Human();
+        citizen.setIJ(castle.getI() +10, castle.getJ()+10);
+        pane.getChildren().addAll(citizen);
         applyRules.start();
         handleEvents();
     }

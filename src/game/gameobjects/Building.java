@@ -11,11 +11,11 @@ public class Building extends GameObject {
 
     private boolean placed;
 
-    public Building(String imageKey , Vector2D location , Tile on)
+    public Building(String imageKey)
     {
-        super(imageKey , location , on);
-        placed = false;
+        super(imageKey);
     }
+
 
     public void produce(){}
     public boolean isPlaced() {

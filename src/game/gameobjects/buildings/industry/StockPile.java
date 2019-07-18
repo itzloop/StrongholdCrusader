@@ -3,6 +3,8 @@ package game.gameobjects.buildings.industry;
 import game.AssetManager;
 import game.GV;
 import game.gameobjects.Building;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.gameobjects.buildings.castle.ResourceType;
@@ -24,8 +26,9 @@ public class StockPile extends Building {
     private static ImageView img2 ;
     private static ImageView img3 ;
 
-    public StockPile(Vector2D location){
-        super("building-industry-1" , location);
+    public StockPile(){
+        super("building-industry-1" );
+        setGameObjectHelper(new GameObjectHelper( "building-industry-1" , getObjectId() , GameobjectType.STOCKPILE ));
         HBox toolbar = new HBox();
         Castle.getMaxStockPileCapacity().getAndAdd(GV.stockPileCapacity);
         img1 = new ImageView(AssetManager.images.get("wood"));

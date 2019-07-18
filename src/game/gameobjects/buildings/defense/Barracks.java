@@ -1,15 +1,19 @@
 package game.gameobjects.buildings.defense;
 
 import game.gameobjects.Building;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.map.Vector2D;
 import javafx.scene.layout.HBox;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Barracks extends Building {
     private static final AtomicInteger count = new AtomicInteger(0);
-    private Barracks(Vector2D location  )
+    private Barracks()
     {
-        super("building-defense-5" ,location );
+        super("building-defense-5" );
+        setGameObjectHelper(new GameObjectHelper( "building-defense-5" , getObjectId() , GameobjectType.BARRACKS ));
+
         count.getAndIncrement();
         HBox toolbar = new HBox();
         //TODO Fix the toobar
@@ -18,10 +22,10 @@ public class Barracks extends Building {
 
     }
 
-    public static Barracks createBrracks(Vector2D location)
+    public static Barracks createBrracks()
     {
         if(count.get() < 1)
-            return new Barracks(location);
+            return new Barracks();
         else return null;
     }
 

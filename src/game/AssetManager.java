@@ -19,10 +19,16 @@ public class AssetManager {
 
 
             images.put("building-castle" , new Image(new FileInputStream("Resources/Tiles2/tile_buildings2.gm1/castle.png")));
+            images.put("body" , new Image(new FileInputStream("Resources/Other NPCs/body_peasant.gm1/0_0img99.png")));
             images.put("dust" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection140.png")));
+            images.put("dust2" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection138.png")));
+            images.put("dust3" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection329.png")));
             images.put("sea" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection43.png")));
+            images.put("mount1" , new Image(new FileInputStream("Resources/Tiles2/tile_land3.gm1/collection0.png")));
+            images.put("mount2" , new Image(new FileInputStream("Resources/Tiles2/tile_land3.gm1/collection1.png")));
+            images.put("mount3" , new Image(new FileInputStream("Resources/Tiles2/tile_land3.gm1/collection2.png")));
             images.put("tile4" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection140-4x4.png")));
-            images.put("grass" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection186.png")));
+            images.put("grass" , new Image(new FileInputStream("Resources/Tiles2/tile_land_macros.gm1/collection505.png")));
             images.put("toolbar" , new Image(new FileInputStream("Resources/Misc/face800-blank.gm1/0_0img0.png")));
             images.put("toolbar-fill" , new Image(new FileInputStream("Resources/Misc/edge1024l.tgx.png")));
             images.put("toolbar-btn-defense" , new Image(new FileInputStream("Resources/Misc/interface_buttons.gm1/0_0img7.png")));

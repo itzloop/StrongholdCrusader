@@ -7,8 +7,10 @@ import java.util.Optional;
 public enum TileType
 {
     DUST(0),
-    MOUNTAIN(1),
-    SEA(2);
+    SEA(1),
+    MOUNTAIN(2),
+    GRASS(3);
+
     private int value;
     TileType(int value)
     {

@@ -3,6 +3,8 @@ package game.gameobjects.buildings.industry;
 import game.AssetManager;
 import game.gameobjects.Building;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.map.Map;
@@ -15,8 +17,9 @@ public class PitchRig extends Building {
 
 
 
-    public PitchRig(Vector2D location){
-        super("building-industry-6" , location);
+    public PitchRig(){
+        super("building-industry-6" );
+        setGameObjectHelper(new GameObjectHelper( "building-industry-6" , getObjectId() , GameobjectType.PITCH_RIG ));
         HBox toolbar = new HBox();
         Label label = new Label("Pitch Rig");
         label.setStyle("-fx-font-size: 50");

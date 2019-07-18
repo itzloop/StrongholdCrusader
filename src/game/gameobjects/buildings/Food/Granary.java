@@ -3,6 +3,8 @@ package game.gameobjects.buildings.Food;
 import game.AssetManager;
 import game.GV;
 import game.gameobjects.Building;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.gameobjects.buildings.castle.ResourceType;
@@ -27,9 +29,10 @@ public class Granary extends Building {
     private static ImageView img7;
     private static ImageView img8;
 
-    public Granary(Vector2D location)
+    public Granary()
     {
-        super("building-food-1" , location);
+        super("building-food-1" );
+        setGameObjectHelper(new GameObjectHelper( "building-food-1" , getObjectId() , GameobjectType.GRANARY ));
         HBox toolbar = new HBox();
         Castle.getMaxGranaryCapacity().getAndAdd(GV.GranaryCapacity);
         toolbar.getChildren().clear();

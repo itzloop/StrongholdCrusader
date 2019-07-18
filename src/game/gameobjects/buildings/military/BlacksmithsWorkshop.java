@@ -3,6 +3,8 @@ package game.gameobjects.buildings.military;
 import game.AssetManager;
 import game.gameobjects.Building;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.map.Map;
@@ -20,9 +22,10 @@ public class BlacksmithsWorkshop extends Building {
 
 
 
-    private BlacksmithsWorkshop(Vector2D location)
+    private BlacksmithsWorkshop()
     {
-        super("building-military-3" , location);
+        super("building-military-3");
+        setGameObjectHelper(new GameObjectHelper( "building-military-3" , getObjectId() , GameobjectType.BLACKSMITHS_WORKSHOP ));
         HBox toolbar = new HBox();
         Label label = new Label("Blacksmiths Workshop");
         label.setStyle("-fx-font-size: 50");
@@ -55,11 +58,11 @@ public class BlacksmithsWorkshop extends Building {
     }
 
 
-    public static GameObject create(Vector2D location)
+    public static GameObject create()
     {
         if(Castle.getGold().get() - price >= 0 ) {
             Castle.getGold().getAndAdd(-price);
-            return new BlacksmithsWorkshop(location);
+            return new BlacksmithsWorkshop();
         }
         else {
             Map.playSound(AssetManager.sounds.get("need-gold"));

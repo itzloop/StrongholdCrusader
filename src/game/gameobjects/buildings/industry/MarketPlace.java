@@ -3,6 +3,8 @@ package game.gameobjects.buildings.industry;
 import game.AssetManager;
 import game.gameobjects.Building;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.gameobjects.buildings.castle.ResourceType;
@@ -29,8 +31,9 @@ public class MarketPlace extends Building {
 
     Map<String , Integer> prices;
 
-    private MarketPlace(Vector2D location){
-        super("building-industry-7" , location);
+    private MarketPlace(){
+        super("building-industry-7");
+        setGameObjectHelper(new GameObjectHelper( "building-industry-7" , getObjectId() , GameobjectType.MARKETPLACE ));
         count.incrementAndGet();
         prices = new HashMap<>();
         prices.put("meat" , 100);
@@ -200,10 +203,10 @@ public class MarketPlace extends Building {
         super.setToolbar(toolbar);
     }
 
-    public static GameObject createMarketPlace(Vector2D location)
+    public static GameObject createMarketPlace()
     {
         if(count.get() < 1)
-            return new MarketPlace(location);
+            return new MarketPlace();
         else return null;
     }
 

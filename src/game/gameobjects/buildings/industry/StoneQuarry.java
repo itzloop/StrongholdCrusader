@@ -3,6 +3,8 @@ package game.gameobjects.buildings.industry;
 import game.AssetManager;
 import game.gameobjects.Building;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.map.Map;
@@ -22,8 +24,9 @@ public class StoneQuarry extends Building {
 
 
 
-    private StoneQuarry(Vector2D location){
-        super("building-industry-3" , location);
+    private StoneQuarry(){
+        super("building-industry-3" );
+        setGameObjectHelper(new GameObjectHelper( "building-industry-3" , getObjectId() , GameobjectType.STONE ));
         HBox toolbar = new HBox();
         Label label = new Label("Stone Quarry");
         label.setStyle("-fx-font-size: 50");
@@ -47,11 +50,11 @@ public class StoneQuarry extends Building {
     }
 
 
-    public static GameObject create(Vector2D location)
+    public static GameObject create()
     {
         if(Castle.resourceAmount(ResourceName.WOOD) - price >= 0 ) {
             Castle.setResouce(ResourceName.WOOD , -price);
-            return new StockPile(location);
+            return new StockPile();
         }
         else {
             Map.playSound(AssetManager.sounds.get("need-wood"));

@@ -1,34 +1,34 @@
 package game.gameobjects;
 
 import game.map.Vector2D;
+import game.player.Player;
 
 public class GameObjectHelper {
-    private String imageKey;
+
     private int Id;
     private int playerId;
-    private Vector2D location;
-
-    public GameObjectHelper(String imageKey, int id, int playerId, Vector2D location) {
-        this.imageKey = imageKey;
+    private GameobjectType type;
+    private int i , j;
+    public GameObjectHelper(String imageKey, int id, GameobjectType type) {
         Id = id;
-        this.playerId = playerId;
-        this.location = location;
+        this.type = type;
+        this.playerId = Player.getId();
+
     }
 
-    public Vector2D getLocation() {
-        return location;
+    public void setIJ(int i , int j)
+    {
+        this.i = i;
+        this.j = j;
     }
 
-    public void setLocation(Vector2D location) {
-        this.location = location;
+
+    public GameobjectType getType() {
+        return type;
     }
 
-    public String getImageKey() {
-        return imageKey;
-    }
-
-    public void setImageKey(String imageKey) {
-        this.imageKey = imageKey;
+    public void setType(GameobjectType type) {
+        this.type = type;
     }
 
     public int getId() {

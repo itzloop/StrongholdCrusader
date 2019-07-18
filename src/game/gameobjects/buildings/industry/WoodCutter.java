@@ -3,6 +3,8 @@ package game.gameobjects.buildings.industry;
 import game.AssetManager;
 import game.gameobjects.Building;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.map.Map;
@@ -21,8 +23,9 @@ public class WoodCutter extends Building {
 
 
 
-    private WoodCutter(Vector2D location){
-        super("building-industry-2" , location);
+    private WoodCutter(){
+        super("building-industry-2");
+        setGameObjectHelper(new GameObjectHelper( "building-industry-2" , getObjectId() , GameobjectType.WOOD ));
         HBox toolbar = new HBox();
         Label label = new Label("Wood Cutter");
         label.setStyle("-fx-font-size: 50");
@@ -46,11 +49,11 @@ public class WoodCutter extends Building {
     }
 
 
-    public static GameObject create(Vector2D location)
+    public static GameObject create()
     {
         if(Castle.resourceAmount(ResourceName.WOOD) - price >= 0 ) {
             Castle.setResouce(ResourceName.WOOD , -price);
-            return new WoodCutter(location);
+            return new WoodCutter();
         }
         else {
             Map.playSound(AssetManager.sounds.get("need-wood"));

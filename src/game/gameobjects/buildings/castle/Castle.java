@@ -3,11 +3,15 @@ package game.gameobjects.buildings.castle;
 import game.AssetManager;
 import game.GV;
 import game.gameobjects.Building;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.Food.Granary;
 import game.gameobjects.buildings.defense.Armory;
 import game.gameobjects.buildings.industry.MarketPlace;
 import game.gameobjects.buildings.industry.StockPile;
 import game.map.Map;
+import game.map.Tile;
+import game.map.TileType;
 import game.map.Vector2D;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
@@ -37,9 +41,13 @@ public class Castle  extends Building{
     private static Label lblGranary ;
     private static Label lblArmory ;
 
-    private Castle(Vector2D location)
+    private Castle()
     {
-        super("building-castle" , location);
+        super("building-castle" );
+
+        setGameObjectHelper(new GameObjectHelper( "building-castle" , getObjectId() , GameobjectType.CASTLE ));
+
+
         HBox toolbar = new HBox();
         Label lblTax = new Label("tax rate: ");
         lblTax.setStyle("-fx-font-size: 18");
@@ -69,10 +77,10 @@ public class Castle  extends Building{
     }
 
 
-    public static Castle createCastle(Vector2D location)
+    public static Castle createCastle()
     {
         if(count.get() < 1){
-            return new Castle(location);
+            return new Castle();
         }
         else return null;
     }

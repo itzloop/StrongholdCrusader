@@ -3,6 +3,8 @@ package game.gameobjects.buildings.farm;
 import game.AssetManager;
 import game.gameobjects.Building;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.map.Map;
@@ -19,9 +21,10 @@ public class AppleFarm extends Building {
     //per second
     private final static int productionRate = 10;
 
-    private AppleFarm(Vector2D location)
+    private AppleFarm()
     {
-        super("building-farm-3" , location);
+        super("building-farm-3");
+        setGameObjectHelper(new GameObjectHelper( "building-farm-3" , getObjectId() , GameobjectType.APPLE_FARM ));
         HBox toolbar = new HBox();
         Label label = new Label("Apple Farm");
         label.setStyle("-fx-font-size: 50");
@@ -44,11 +47,11 @@ public class AppleFarm extends Building {
     }
 
 
-    public static GameObject create(Vector2D location)
+    public static GameObject create()
     {
         if(Castle.resourceAmount(ResourceName.WOOD) - price >= 0 ) {
             Castle.setResouce(ResourceName.WOOD , -price);
-            return new AppleFarm(location);
+            return new AppleFarm();
         }
         else {
             Map.playSound(AssetManager.sounds.get("need-wood"));

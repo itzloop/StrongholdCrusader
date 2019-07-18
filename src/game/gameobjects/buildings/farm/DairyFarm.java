@@ -3,6 +3,8 @@ package game.gameobjects.buildings.farm;
 import game.AssetManager;
 import game.gameobjects.Building;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.map.Map;
@@ -18,9 +20,10 @@ public class DairyFarm extends Building {
     private final static int price = 10;
     //per second
     private final static int productionRate = 10;
-    private DairyFarm(Vector2D location)
+    private DairyFarm()
     {
-        super("building-farm-2" , location);
+        super("building-farm-2");
+        setGameObjectHelper(new GameObjectHelper( "building-farm-2" , getObjectId() , GameobjectType.DAIRY_FARM ));
         HBox toolbar = new HBox();
         Label label = new Label("Dairy Farm");
         label.setStyle("-fx-font-size: 50");
@@ -43,11 +46,11 @@ public class DairyFarm extends Building {
     }
 
 
-    public static GameObject create(Vector2D location)
+    public static GameObject create()
     {
         if(Castle.resourceAmount(ResourceName.WOOD) - price >= 0 ) {
             Castle.setResouce(ResourceName.WOOD , -price);
-            return new DairyFarm(location);
+            return new DairyFarm();
         }
         else {
             Map.playSound(AssetManager.sounds.get("need-wood"));

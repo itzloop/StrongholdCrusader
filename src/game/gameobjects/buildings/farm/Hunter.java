@@ -3,6 +3,8 @@ package game.gameobjects.buildings.farm;
 import game.AssetManager;
 import game.gameobjects.Building;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.gameobjects.buildings.castle.Castle;
 import game.gameobjects.buildings.castle.ResourceName;
 import game.map.Map;
@@ -19,9 +21,10 @@ public class Hunter extends Building {
     private final static int productionRate = 10;
 
 
-    private Hunter(Vector2D location)
+    private Hunter()
     {
-        super("building-farm-1" , location);
+        super("building-farm-1" );
+        setGameObjectHelper(new GameObjectHelper( "building-farm-1" , getObjectId() , GameobjectType.HUNTER ));
         HBox toolbar = new HBox();
         Label label = new Label("Hunters Hatch");
         label.setStyle("-fx-font-size: 50");
@@ -45,11 +48,11 @@ public class Hunter extends Building {
     }
 
 
-    public static GameObject create(Vector2D location)
+    public static GameObject create()
     {
         if(Castle.resourceAmount(ResourceName.WOOD) - price >= 0 ) {
             Castle.setResouce(ResourceName.WOOD , -price);
-            return new Hunter(location);
+            return new Hunter();
         }
         else {
             Map.playSound(AssetManager.sounds.get("need-wood"));

@@ -3,32 +3,41 @@ package game.gameobjects.units;
 import game.AssetManager;
 import game.GV;
 import game.gameobjects.GameObject;
+import game.gameobjects.GameObjectHelper;
+import game.gameobjects.GameobjectType;
 import game.map.Map;
 import game.map.Tile;
-import game.map.TileType;
-import game.map.Vector2D;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 
-import javax.swing.text.html.ImageView;
 import java.util.*;
 
 public class Human extends GameObject {
-    public Human(Vector2D location){
-        super("" , location);
+    public Human(){
+
+        super("body" );
+        setGameObjectHelper(new GameObjectHelper( "building-castle" , getObjectId() , GameobjectType.CASTLE ));
     }
+    private static boolean isRunning;
 
     public void move(Tile b)  {
-       Stack<Tile> path = AStar(b);
+        isRunning = false;
+        Stack<Tile> path = AStar(b);
+        try {
+            Thread.sleep(501);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        isRunning = true;
         System.out.println(path);
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(2);
+        timeline.setAutoReverse(true);
         if(Optional.ofNullable(path).isPresent()) {
-            while (!path.isEmpty()) {
+            while (!path.isEmpty() && isRunning) {
                 Tile tile = path.pop();
                 Platform.runLater(() -> {
-                    this.setX(tile.getPos().getX());
-                    this.setY(tile.getPos().getY());
+                    setTile(tile);
                 });
                 try {
                     Thread.sleep(500);
@@ -42,9 +51,6 @@ public class Human extends GameObject {
             System.out.println("no path is found");
         }
     }
-
-
-
 
         private Stack<Tile> drawPath(java.util.Map<Tile , Tile> cameFrom , Tile current ){
             Stack<Tile> totalPath = new Stack<>();
@@ -62,17 +68,12 @@ public class Human extends GameObject {
             Queue<Tile> open = new PriorityQueue<>();
             Queue<Tile> close = new PriorityQueue<>();
             java.util.Map<Tile , Tile> cameFrom = new HashMap<>();
-            open.add(getOn());
-            getOn().setG(0);
-            getOn().setF(getOn().getPos().distance(target.getPos()));
+            open.add(getTile());
+            getTile().setG(0);
+            getTile().setF(getTile().getPos().distance(target.getPos()));
             Tile current;
             while (!open.isEmpty())
             {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 current = open.poll();
                 if (current.equals(target))
                 {
@@ -82,19 +83,16 @@ public class Human extends GameObject {
                 for (Tile neighbor : Map.adjList.get(current))
                 {
                     //TODO fix this later
-                    if(true) {
+                    if(!neighbor.isObstacle() && neighbor.getOccupiedType().equals(GameobjectType.EMPTY)) {
                         if (close.contains(neighbor)) {
-                            neighbor.setImage(AssetManager.images.get("dust"));
                             continue;
                         }
                         double tentativeGScore = current.getG() + current.getPos().distance(neighbor.getPos());
                         if (!open.contains(neighbor))
                             open.add(neighbor);
                         else if (tentativeGScore >= neighbor.getG()) {
-                            neighbor.setImage(AssetManager.images.get("dust"));
                             continue;
-                        }
-                        neighbor.setImage(AssetManager.images.get("grass"));
+                        };
                         cameFrom.put(neighbor, current);
                         neighbor.setG(tentativeGScore);
                         neighbor.setF(neighbor.getG() + neighbor.getPos().distance(target.getPos()));
